@@ -5799,13 +5799,11 @@ function handlePopup($popup) {
         context: $popup,
       })
       let $menuItems =  /** @type {NodeListOf<HTMLElement>} */ ($dropdown.querySelectorAll('div[role="menuitem"]'))
-      let $selectedSvg = $popup.querySelector('div[role="menuitem"] svg')
       for (let [index, $menuItem] of $menuItems.entries()) {
-        let shouldBeSelected = index == {popular: 0, mostRecent: 1}[config.sortFollowing]
-        if (shouldBeSelected) {
-          $menuItem.lastElementChild.append($selectedSvg)
-        }
         $menuItem.addEventListener('click', () => {
+          let sortFollowing = /** @type {'popular' | 'mostRecent'} */ (index == 0 ? 'popular' : 'mostRecent')
+          config.sortFollowing = sortFollowing
+          storeConfigChanges({sortFollowing})
           userSortedFollowing = true
         })
       }
