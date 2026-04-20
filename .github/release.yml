@@ -1,0 +1,23 @@
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+  categories:
+    - title: ✨ New features
+      labels:
+        - feature
+        - feat
+        - enhancement
+    - title: 🐛 Bug fixes
+      labels:
+        - bug
+        - fix
+    - title: 🛠 Maintenance
+      labels:
+        - chore
+        - refactor
+        - ci
+        - docs
+    - title: 📦 Other
+      labels:
+        - "*"
