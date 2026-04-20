@@ -1,21 +1,76 @@
 :root {
-  color-scheme: light dark;
+  color-scheme: dark;
+
+  --bg:            #000000;
+  --bg-raised:     #000000;
+  --bg-inset:      #141414;
+  --fg:            #fafafa;
+  --fg-muted:      #8a8a8a;
+  --fg-faint:      #7a7a7a;
+  --border:        #2e2e2e;
+  --border-soft:   #1c1c1c;
+  --border-strong: #5f5f5f;
+  --track:         #3a3a3a;
+  --thumb:        #fafafa;
+  --hover:        rgba(255, 255, 255, .035);
+
+  --accent:       #1d9bf0;
+  --accent-ink:   #ffffff;
+  --accent-glow:  rgba(29, 155, 240, .28);
+  --ring:         rgba(29, 155, 240, .4);
+  --danger:       #e5484d;
+
+  --font-body: "Geist", ui-sans-serif, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --font-display: "Geist", ui-sans-serif, -apple-system, sans-serif;
+
+  --ease-out: cubic-bezier(.2, .7, .2, 1);
+  --ease-in-out: cubic-bezier(.4, 0, .2, 1);
+
+  --cell-pad-y: 12px;
+  --cell-pad-x: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--fg);
 }
 
 body {
   user-select: none;
   padding: 0;
   margin: 0;
-  /* XXX These are defaults for Chrome, do something else instead */
-  font-size: 13px;
-  font-family: Roboto, "Segoe UI", Tahoma, sans-serif;
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.005em;
 }
 
 body.browserAction {
   min-width: 450px;
+  max-width: 560px;
 }
 body.iOS.browserAction {
   min-width: 0;
+}
+
+body:not(.browserAction) form {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 0 0 80px;
+}
+body.browserAction form {
+  padding: 0 0 20px;
+}
+
+form {
+  position: relative;
 }
 
 body.mobile .desktop,
@@ -32,7 +87,6 @@ body:not(.hidingMetrics) .hidingMetrics,
 body:not(.hidingQuotesFrom) #hideQuotesFromDetails,
 body:not(.hidingSuggestedFollows) .hidingSuggestedFollows,
 body:not(.hidingTwitterBlueReplies) .hidingTwitterBlueReplies,
-body:not(.iOS.safari) .toggle,
 body:not(.mutingQuotes) #mutedQuotesDetails,
 body:not(.showingBlueReplyFollowersCount) .showingBlueReplyFollowersCount,
 body:not(.showingSidebarContent) .showingSidebarContent,
@@ -41,75 +95,649 @@ body:not(.uninvertedFollowButtons) .uninvertedFollowButtons {
   display: none;
 }
 
-.icon {
-  height: 1.25rem;
-}
-
-#searchSection {
-  padding: 8px 12px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: Canvas;
-  border-bottom: 1px solid #B6B6B6;
-}
-#searchInput {
-  width: 100%;
-  padding: 6px 10px;
-  box-sizing: border-box;
-  font: inherit;
-  border: 1px solid #B6B6B6;
-  border-radius: 6px;
-  background: Field;
-  color: FieldText;
-}
-body.disabled #searchSection {
-  display: none;
-}
 .cpft_hidden_by_search {
   display: none !important;
 }
 
-body.macOS.safari .icon {
+body.tab-timeline    form > [data-tab]:not([data-tab="timeline"]),
+body.tab-behavior    form > [data-tab]:not([data-tab="behavior"]),
+body.tab-xfixes      form > [data-tab]:not([data-tab="xfixes"]),
+body.tab-appearance  form > [data-tab]:not([data-tab="appearance"]),
+body.tab-navigation  form > [data-tab]:not([data-tab="navigation"]),
+body.tab-advanced    form > [data-tab]:not([data-tab="advanced"]) {
+  display: none;
+}
+body.tab-timeline   .tab-intro:not([data-for-tab="timeline"]),
+body.tab-behavior   .tab-intro:not([data-for-tab="behavior"]),
+body.tab-xfixes     .tab-intro:not([data-for-tab="xfixes"]),
+body.tab-appearance .tab-intro:not([data-for-tab="appearance"]),
+body.tab-navigation .tab-intro:not([data-for-tab="navigation"]),
+body.tab-advanced   .tab-intro:not([data-for-tab="advanced"]) {
   display: none;
 }
 
-body.iOS.safari .icon {
-  height: 1.75rem;
+body.searching form > [data-tab]:not(.cpft_hidden_by_search) {
+  display: block !important;
+}
+body.searching .tab-bar-wrap,
+body.searching .tab-intro {
+  display: none !important;
 }
 
-body.disabled .icon {
-  filter: grayscale(100%);
+/* ================================================================== */
+/* Top header grid — brand | status | version                          */
+/* ================================================================== */
+.app-brand {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin: 0;
+}
+.app-brand > .brand-text,
+.app-brand > .brand-status,
+.app-brand > .brand-version {
+  padding: 14px var(--cell-pad-x);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+}
+.app-brand > .brand-status,
+.app-brand > .brand-version {
+  border-left: 1px solid var(--border);
+  justify-content: center;
+}
+.brand-icon {
+  height: 18px;
+  width: 18px;
+  flex-shrink: 0;
+  filter: grayscale(100%) brightness(1.4) invert(1);
+  opacity: .9;
+}
+.brand-text {
+  gap: 12px;
+}
+.brand-eyebrow {
+  display: none;
+}
+.brand-name {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+.brand-name em {
+  font-style: normal;
+  color: var(--fg-muted);
+  margin: 0 0 0 2px;
+}
+.brand-name em::before {
+  content: "/ ";
+  color: var(--fg-faint);
 }
 
-body.disabled form > section ~ section {
-  visibility: hidden;
+.brand-status,
+.brand-version {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+.brand-status {
+  min-width: 120px;
+}
+.brand-version {
+  min-width: 90px;
+}
+body.disabled .brand-icon {
+  filter: grayscale(100%) brightness(.5);
 }
 
-body.disabled:not(.safari) form > section {
-  border-bottom: 1px solid var(--border-color);
+/* ================================================================== */
+/* Master enabled toggle row — acts as the status cell too             */
+/* ================================================================== */
+.master-section {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+.master-toggle {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 18px var(--cell-pad-x) !important;
+  margin: 0 !important;
+  background: transparent;
+  border: 0;
+  border-radius: 0 !important;
+}
+.master-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+.master-label #enabled {
+  font-family: inherit;
+}
+.master-status {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--fg-faint);
+  transition: background 180ms var(--ease-out), box-shadow 240ms var(--ease-out);
+}
+body:not(.disabled) .master-status {
+  background: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+}
+body:not(.disabled) .master-status {
+  animation: pulse-dot 2.4s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 4px var(--accent-glow); }
+  50%      { box-shadow: 0 0 0 2px var(--accent-glow); }
 }
 
+/* ================================================================== */
+/* Search cell                                                         */
+/* ================================================================== */
+#searchSection {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg);
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+.search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--cell-pad-x);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  min-height: 44px;
+  transition: background 160ms var(--ease-out);
+}
+.search-wrap:focus-within {
+  background: var(--bg-inset);
+}
+.search-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--fg-faint);
+  pointer-events: none;
+  position: static;
+  transform: none;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+.search-wrap:focus-within .search-icon {
+  color: var(--accent);
+}
+#searchInput {
+  flex: 1;
+  padding: 8px 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: .04em;
+  font-weight: 400;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--fg);
+  min-width: 0;
+}
+#searchInput::placeholder {
+  color: var(--fg-faint);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+#searchInput::-webkit-search-cancel-button {
+  appearance: none;
+}
+.search-kbd {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--fg-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 2px 6px;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-left: 8px;
+  letter-spacing: .1em;
+}
+.search-wrap:focus-within .search-kbd {
+  display: none;
+}
+.search-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid var(--accent);
+  border-radius: 2px;
+  padding: 2px 6px;
+  margin-left: 8px;
+  flex-shrink: 0;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+body.disabled #searchSection {
+  display: none;
+}
+
+/* ================================================================== */
+/* Tab bar — grid of cells with hairline separators                    */
+/* ================================================================== */
+.tab-bar-wrap {
+  position: sticky;
+  top: 44px; /* sits just below the sticky #searchSection (min-height 44px) */
+  z-index: 9;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: stretch;
+}
+.tab-bar {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+}
+.tab-bar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Scroll arrows overlay the bar edges with a fade into the bg color */
+.tab-scroll {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--fg-muted);
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  padding: 0;
+  transition: color 140ms var(--ease-out);
+}
+.tab-scroll:hover {
+  color: var(--accent);
+}
+.tab-scroll:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: -3px;
+}
+.tab-scroll-left {
+  left: 0;
+  background: linear-gradient(to right, var(--bg) 55%, transparent 100%);
+  border-right: 1px solid var(--border-soft);
+}
+.tab-scroll-right {
+  right: 0;
+  background: linear-gradient(to left, var(--bg) 55%, transparent 100%);
+  border-left: 1px solid var(--border-soft);
+}
+.tab-bar-wrap.has-scroll-left  .tab-scroll-left,
+.tab-bar-wrap.has-scroll-right .tab-scroll-right {
+  display: flex;
+}
+.tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 0;
+  border-left: 1px solid var(--border);
+  padding: 14px 16px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--fg-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  flex: 1 0 auto;
+  min-width: 0;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  transition: color 160ms var(--ease-out), background 160ms var(--ease-out);
+}
+.tab:first-of-type {
+  border-left: 0;
+}
+.tab:hover {
+  color: var(--fg);
+  background: var(--hover);
+}
+.tab-num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--fg-faint);
+  letter-spacing: .1em;
+  font-variant-numeric: tabular-nums;
+}
+.tab-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .18em;
+}
+.tab[aria-selected="true"] {
+  color: var(--fg);
+  background: var(--bg-inset);
+}
+.tab[aria-selected="true"] .tab-num {
+  color: var(--accent);
+}
+.tab[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: var(--accent);
+}
+.tab-indicator {
+  display: none;
+}
+body.disabled .tab-bar {
+  display: none;
+}
+
+/* ================================================================== */
+/* Tab intro — tiny eyebrow + one-line description                     */
+/* ================================================================== */
+.tab-intro {
+  padding: 20px var(--cell-pad-x);
+  border-bottom: 1px solid var(--border);
+  animation: intro-in 280ms var(--ease-out);
+}
+.tab-intro-eyebrow {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.tab-intro-body {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.6;
+  letter-spacing: .02em;
+  font-weight: 400;
+  color: var(--fg-muted);
+  margin: 0;
+  max-width: 62ch;
+}
+@keyframes intro-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+body.disabled .tab-intro {
+  display: none;
+}
+
+/* ================================================================== */
+/* Group (section) — hairline-separated, numbered                      */
+/* ================================================================== */
+form > section.group.labelled,
+form > section.experiments-wrap {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+  animation: section-in 240ms var(--ease-out);
+}
+@keyframes section-in {
+  from { opacity: 0; transform: translateY(2px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+body.disabled form > section.group.labelled,
+body.disabled form > section.experiments-wrap,
+body.disabled form > .tab-bar,
+body.disabled form > .tab-intro,
+body.disabled form > #searchSection {
+  display: none;
+}
+
+section.group > label:not(.checkbox) {
+  display: block;
+  cursor: default;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  padding: 18px var(--cell-pad-x) 10px;
+  margin: 0;
+  border: 0;
+}
+
+/* Nested sub-group */
+section.group section.group {
+  background: var(--bg-inset);
+  border: 0;
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+  border-radius: 0;
+  padding: 0;
+  margin: 6px 0;
+}
+section.group section.group > label:not(.checkbox) {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  color: var(--fg-faint);
+  padding: 10px var(--cell-pad-x) 6px;
+}
+
+/* ================================================================== */
+/* Row — individual option                                             */
+/* ================================================================== */
 label:not([for]) {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  padding: 4px 12px;
-  margin: 8px 0;
+  align-items: center;
+  gap: 16px;
+  padding: 10px var(--cell-pad-x);
+  margin: 0;
   cursor: pointer;
+  border: 0;
+  border-radius: 0;
+  transition: background 140ms var(--ease-out);
+  font-size: 13px;
+  line-height: 1.45;
+}
+label:not([for]):hover {
+  background: var(--hover);
+}
+label.button {
+  gap: 12px;
+  align-items: center;
+}
+label.button button,
+label.button input[type="button"] {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--fg);
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: 2px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: border-color 140ms var(--ease-out), color 140ms var(--ease-out);
+}
+label.button button:hover,
+label.button input[type="button"]:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
-label.button button {
-  margin-left: 12px;
+/* Help text under a row */
+section.group > p,
+section.group > section > p {
+  margin: 0;
+  padding: 0 var(--cell-pad-x) 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.55;
+  letter-spacing: .02em;
+  color: var(--fg-muted);
+  font-style: normal;
 }
 
-summary {
-  padding-left: 12px;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  margin-top: 8px;
-  margin-bottom: 8px;
+/* Indent nested options */
+section.group > section {
+  margin-left: 0;
+  border-top: 1px solid var(--border-soft);
+}
+section.group > section > section {
+  margin-left: 0;
+  border-top: 1px solid var(--border-soft);
+}
+section.group > section:first-of-type {
+  border-top: 0;
+}
+section.group > section > section:first-of-type {
+  border-top: 0;
+}
+section.group > section > section > label {
+  padding-left: calc(var(--cell-pad-x) + 16px);
+}
+
+/* ================================================================== */
+/* Custom toggle — pure black track, Twitter-blue on                   */
+/* ================================================================== */
+.checkbox {
+  position: relative;
+}
+body:not(.safari) .checkbox input[type="checkbox"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  margin: -1px;
+  padding: 0;
+  border: 0;
+}
+body:not(.safari) .toggle {
+  position: relative;
+  display: inline-block;
+  width: 32px;
+  height: 18px;
+  background: var(--track);
+  border-radius: 999px;
+  flex-shrink: 0;
+  transition: background 180ms var(--ease-in-out);
   cursor: pointer;
+}
+body:not(.safari) .toggle::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--thumb);
+  transition: transform 180ms var(--ease-in-out);
+}
+body:not(.safari) input[type="checkbox"]:checked + .toggle {
+  background: var(--accent);
+}
+body:not(.safari) input[type="checkbox"]:checked + .toggle::after {
+  transform: translateX(14px);
+  background: #ffffff;
+}
+body:not(.safari) input[type="checkbox"]:focus-visible + .toggle {
+  outline: 1px solid var(--accent);
+  outline-offset: 2px;
+}
+body:not(.iOS.safari) .checkbox input[type="checkbox"] {
+  /* accessibility: keep input in DOM, visually hidden */
+}
+
+body.macOS.safari .checkbox input[type="checkbox"] {
+  position: static;
+  width: auto;
+  height: auto;
+  clip: auto;
+  margin: 0;
+}
+body.macOS.safari .toggle {
+  display: none;
+}
+
+/* ================================================================== */
+/* Select — bare rectangle                                             */
+/* ================================================================== */
+select {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--fg);
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: 2px;
+  padding: 5px 26px 5px 10px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 10px 10px;
+  transition: border-color 140ms var(--ease-out), color 140ms var(--ease-out);
+}
+select:hover {
+  border-color: var(--fg-muted);
+}
+select:focus-visible {
+  outline: 0;
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 input[type=checkbox],
@@ -117,179 +745,265 @@ select {
   cursor: pointer;
 }
 
-input[type=checkbox] {
-  margin-left: 12px;
-  flex-shrink: 0;
-}
-
-section.group > label:not(.checkbox) {
-  cursor: default;
-}
-
-section:not(:first-of-type) {
-  border-top: 1px solid #f0f0f0;
-}
-
-section.group > section {
-  margin-left: 40px;
-}
-
-section.group > label {
-  margin-bottom: 12px;
-}
-
-section.group > section > * {
-  color: rgb(95, 99, 104);
-  padding-left: 0;
-}
-
-section.group > p {
-  margin: 0 0 12px 40px;
-  font-size: 12px;
-}
-
-section.group > section > p {
-  margin: 0 60px 12px 0;
-  font-size: 12px;
-}
-
+/* ================================================================== */
+/* Text inputs                                                         */
+/* ================================================================== */
 section.text label {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+  align-items: stretch;
+}
+section.text input[type="text"] {
+  padding: 8px 12px;
+  font: inherit;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  color: var(--fg);
+  border-radius: 2px;
+  transition: border-color 140ms var(--ease-out);
+}
+section.text input[type="text"]:focus {
+  outline: 0;
+  border-color: var(--accent);
 }
 
-section.text input[type="text"] {
-  padding: 6px 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: inherit;
+/* ================================================================== */
+/* Details / experiments                                               */
+/* ================================================================== */
+#experiments {
+  padding: 0;
+}
+#experiments[open] summary {
+  border-bottom: 1px solid var(--border-soft);
+}
+summary {
+  padding: 14px var(--cell-pad-x);
+  margin: 0;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  list-style: none;
+  position: relative;
+}
+summary::-webkit-details-marker {
+  display: none;
+}
+summary::after {
+  content: "+";
+  position: absolute;
+  right: var(--cell-pad-x);
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--fg-faint);
+  transition: transform 200ms var(--ease-out);
+}
+details[open] > summary::after {
+  transform: translateY(-50%) rotate(45deg);
+  color: var(--accent);
 }
 
 section.textarea {
   display: flex;
-  justify-content: space-between;
-  padding: 4px 12px 4px 0;
-  margin: 8px 0;
   flex-direction: column;
+  gap: 10px;
   align-items: stretch;
-  gap: 12px;
+  padding: 14px 20px 20px;
+  margin: 0;
 }
-
-section.textarea button {
-  text-align: center;
+section.textarea label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--fg-muted);
+  letter-spacing: .22em;
+  text-transform: uppercase;
 }
-
 textarea {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--fg);
+  background: var(--bg-inset);
+  border: 1px solid var(--border-strong);
+  border-radius: 2px;
+  padding: 10px 12px;
   resize: vertical;
+  transition: border-color 140ms var(--ease-out);
 }
-/* Prevent zooming */
+textarea:focus {
+  outline: 0;
+  border-color: var(--accent);
+}
+section.textarea button {
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--fg);
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: 2px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: border-color 140ms var(--ease-out), color 140ms var(--ease-out);
+}
+section.textarea button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 body.iOS.safari textarea {
   font-size: 16px;
 }
 
+/* ================================================================== */
+/* Inline details (muted quotes, hide quotes from) — nested only.      */
+/* Scoped to section.group so the top-level #experiments keeps the     */
+/* full-size summary styling (mono caps with 16px horizontal padding). */
+/* ================================================================== */
+section.group details {
+  padding: 0 var(--cell-pad-x) 6px;
+}
+section.group details summary {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  padding: 6px 0;
+}
 #mutedQuotes p {
   white-space: pre-line;
 }
 
-#version {
-  text-align: center;
-  font-size: 75%;
-  margin-top: 12px;
-  margin-bottom: 8px;
+/* ================================================================== */
+/* Status label — ACTIVE / PAUSED inside header status cell            */
+/* ================================================================== */
+.status-label::before {
+  content: "ACTIVE";
+  letter-spacing: inherit;
 }
-body.disabled #version {
-  display: none;
+body.disabled .status-label::before {
+  content: "PAUSED";
+  color: var(--fg-faint);
+}
+#debugCountdown {
+  margin-left: 6px;
+  color: var(--accent);
 }
 
-/* Firefox overrides */
+/* ================================================================== */
+/* Firefox overrides — keep modern design, tweak font rendering        */
+/* ================================================================== */
 @-moz-document url-prefix() {
   body {
-    font-family: inherit;
-    font-size: 15px;
+    font-size: 14px;
   }
   body.browserAction {
     min-width: auto;
-    max-width: 450px;
-  }
-  section:not(:first-of-type) {
-    border-color: #d7d7db;
-  }
-  section.group > p,
-  section.group > section > * {
-    color: rgb(91, 91, 102);
-  }
-  section.group > p,
-  section.group > section > p {
-    font-size: 14px;
+    max-width: 460px;
   }
 }
 
-/* Edge overrides */
+/* ================================================================== */
+/* Edge — minor tweaks                                                 */
+/* ================================================================== */
 body.edge {
-  font-family: "system-ui", sans-serif;
-  font-size: 14px;
-}
-body.edge section:not(:first-of-type) {
-  border-color: #B6B6B6;
-}
-body.edge section.group > label {
-  font-weight: 600;
-}
-body.edge section.group > p,
-body.edge section.group > section > * {
-  color: #767676;
+  /* Inherits the modern look */
 }
 
-/* Safari overrides */
+/* ================================================================== */
+/* Safari (macOS) — preserve near-native styling                       */
+/* ================================================================== */
 body.safari {
-  font-family: system-ui;
+  font-family: system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
   -webkit-user-select: none;
 }
 
-/* Safari overrides (macOS) */
-body.macOS.safari form {
-  padding: 4px 0;
+/* Show all groups on Safari (no tab filtering) */
+body.safari form > [data-tab] {
+  display: block !important;
 }
-/* Space option groups */
-body.macOS.safari form > section:not(:first-of-type) {
+body.safari .tab-bar,
+body.safari .tab-intro {
+  display: none !important;
+}
+body.safari .app-brand {
+  padding: 8px 0 16px;
+}
+body.safari .brand-name {
+  font-family: system-ui;
+  font-style: normal;
+  font-weight: 600;
+}
+body.safari .brand-name em {
+  font-style: normal;
+}
+body.safari .master-toggle,
+body.safari .search-wrap {
+  border-radius: 10px;
+}
+
+/* Safari overrides (macOS) — close to original native styling */
+body.macOS.safari form {
+  padding: 16px 18px;
+  max-width: 700px;
+}
+body.macOS.safari form > section.group.labelled,
+body.macOS.safari form > section.experiments-wrap {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 20px 0;
+}
+body.macOS.safari form > section:not(:first-of-type):not(.master-section) {
   margin-top: 20px;
 }
-/* Add colons to option group labels */
-body.macOS.safari form > section.group > label:not(.checkbox)::after {
+body.macOS.safari form > section.group.labelled > label:not(.checkbox) {
+  font-family: system-ui;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 14px;
+  border-bottom: none;
+  padding: 0 0 4px;
+}
+body.macOS.safari form > section.group.labelled > label:not(.checkbox)::after {
   content: ":";
 }
-body.macOS.safari form > section.group > label {
-  margin-bottom: 0;
-}
-/* Indent options to align with the toggle all checkbox if there is one */
 body.macOS.safari section.group > section {
   margin-left: 32px;
 }
-/* Align option group help text with options */
-body.macOS.safari form > section.group > p {
-  margin: 12px 12px 12px 32px;
-}
-/* Don't display dividing lines between option groups or options */
 body.macOS.safari section {
   border-top: none;
 }
-/* Indent nested options to align with checkbox labels */
 body.macOS.safari section.group > section > section {
   margin-left: 8px;
 }
-/* Put controls next to their labels... */
 body.macOS.safari label {
   justify-content: start;
   align-items: center;
-  padding-top: 0;
-  padding-bottom: 0;
+  padding: 4px 0;
+  border-radius: 0;
 }
-/* ...except for muted quotes' Unmute button */
+body.macOS.safari label:hover {
+  background: transparent;
+}
 body.macOS.safari label.mutedQuote {
   justify-content: space-between;
 }
-/* Put checkboxes before their labels */
 body.macOS.safari section.checkbox > label,
 body.macOS.safari label.checkbox {
   flex-direction: row-reverse;
@@ -298,115 +1012,143 @@ body.macOS.safari input[type=checkbox] {
   margin-left: 0;
   margin-right: 6px;
 }
-/* Put a period between labels and their buttons. */
 body.macOS.safari label.button :is(div, span) {
-  margin-right: 6px
+  margin-right: 6px;
 }
 body.macOS.safari label.button span::after {
   content: ".";
 }
-/* Add colons to dropdown labels */
 body.macOS.safari section.select label {
   display: block;
 }
 body.macOS.safari section.select span::after {
   content: ": ";
-  display: inline-block
+  display: inline-block;
 }
-/* Align help text with checkbox labels */
 body.macOS.safari section.checkbox > p {
   margin-left: 20px;
   margin-right: 12px;
 }
 body.macOS.safari p {
   color: rgb(123, 123, 123) !important;
+  font-family: system-ui !important;
+  font-style: normal !important;
 }
 body.macOS.safari section.group > section > * {
   color: inherit;
 }
+body.macOS.safari select {
+  background: initial;
+  border: initial;
+  padding: initial;
+  appearance: auto;
+  -webkit-appearance: auto;
+  border-radius: 0;
+  background-image: none;
+}
 
-/* Safari overrides (iOS) */
+/* ================================================================== */
+/* Safari (iOS) — preserve iOS-native grouped-box styling              */
+/* ================================================================== */
 body.iOS.safari {
   background-color: rgb(240, 240, 245);
   padding: 18px;
-  font-size: inherit;
+  font-family: system-ui;
+  font-size: 15px;
+}
+body.iOS.safari form {
+  padding: 0;
+  max-width: none;
+}
+body.iOS.safari .app-brand {
+  padding: 0 0 16px;
+}
+body.iOS.safari .brand-name em {
+  color: rgb(255, 159, 10);
+}
+body.iOS.safari .master-toggle,
+body.iOS.safari .search-wrap {
+  border-radius: 10px;
+  background-color: white;
+  border-color: rgba(0,0,0,.08);
+}
+body.iOS.safari .master-toggle {
+  padding: 12px 18px !important;
+}
+body.iOS.safari .master-toggle .master-label {
+  font-family: system-ui;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 17px;
 }
 body.iOS.safari label {
-  /* Prevent flash when labels are tapped */
   -webkit-tap-highlight-color: transparent;
   padding-left: 0;
   padding-right: 18px;
 }
-/* Option groups should contain their options in a rounded box */
-body.iOS.safari form > section {
+body.iOS.safari form > section.group.labelled,
+body.iOS.safari form > section.experiments-wrap {
   background-color: white;
+  border: none;
   border-radius: 10px;
-  padding-left: 18px;
-  padding-bottom: 1px;
-  padding-top: 1px;
-  border-top: none !important;
+  padding: 1px 18px;
+  margin: 0 0 34px;
 }
-body.iOS.safari form > section:not(:first-of-type) {
-  margin-top: 34px;
-}
-/* All options should have a dividing line */
 body.iOS.safari section.group section {
   border-top: 1px solid rgb(236, 236, 237);
 }
-/* Options should not be indented by default */
 body.iOS.safari section.group > section {
   margin-left: 0;
 }
-/* Groups which have a toggle for all their options should indent their options */
 body.iOS.safari section.group > label.checkbox ~ section,
-/* Nested groups should indent their options */
 body.iOS.safari section.group > section.group > section {
   margin-left: 18px;
 }
-/* Labelled option groups should display their label above the box */
 body.iOS.safari form > section.labelled {
   position: relative;
   margin-top: 46px;
 }
-body.iOS.safari form > section:first-child.labelled {
+body.iOS.safari form > section:first-of-type.labelled {
   margin-top: 12px;
 }
-body.iOS.safari form > section.labelled > label {
+body.iOS.safari form > section.labelled > label:not(.checkbox) {
   position: absolute;
   top: -32px;
   text-transform: uppercase;
   font-size: 75%;
   color: rgb(133, 133, 135);
+  font-family: system-ui;
+  font-style: normal;
+  font-weight: 500;
+  border-bottom: none;
+  padding: 0;
 }
-body.iOS.safari form > section.labelled > label + section,
-body.iOS.safari form > section.labelled > label + section.desktop + section {
-  border-top: none;
-}
-body.iOS.safari form > section.labelled > label + p {
-  margin-top: 12px;
-  margin-left: 0;
-}
-/* A checkbox options with nested options should indent their names */
 body.iOS.safari section.checkbox > section:not(.group) > label {
-  padding-left: 18px
+  padding-left: 18px;
 }
-/* A checkbox option with nested group should indent it */
 body.iOS.safari section.checkbox > section.group {
-  margin-left: 18px
+  margin-left: 18px;
 }
 body.iOS.safari summary {
   padding-left: 0;
+  font-family: system-ui;
+  font-style: normal;
+}
+body.iOS.safari summary::after {
+  color: rgb(99,99,102);
 }
 body.iOS.safari p {
   font-size: inherit !important;
   color: rgb(95, 99, 104) !important;
+  font-family: system-ui !important;
+  font-style: normal !important;
   margin-right: 18px;
 }
 body.iOS.safari section.group > section > * {
   color: inherit;
 }
 
-/* iOS-style toggles */
+/* iOS-style toggles (original) */
 body.iOS.safari .checkbox input[type="checkbox"] {
   position: absolute;
   overflow: hidden;
@@ -474,66 +1216,19 @@ body.iOS.safari .checkbox input:focus + .toggle {
   outline: 5px auto -webkit-focus-ring-color;
 }
 
-/* Dark mode overrides */
+/* iOS safari dark mode */
 @media (prefers-color-scheme: dark) {
-  body {
-    background-color: #292a2d;
-    color: #e8eaed;
-  }
-  section:not(:first-of-type) {
-    border-color: #3f4042;
-  }
-  section.group > p,
-  section.group > section > * {
-    color: rgb(154, 160, 166);
-  }
-  section.text input[type="text"] {
-    background-color: #3f4042;
-    border-color: #5f6368;
-    color: #e8eaed;
-  }
-
-  /* Edge dark mode overrides */
-  body.edge {
-    background-color: #3B3B3B;
-    color: #A7A7A7;
-  }
-  body.edge section.group > label {
-    color: #fff;
-  }
-  body.edge section:not(:first-of-type) {
-    border-color: #737373;
-  }
-  body.edge section.group > p,
-  body.edge section.group > section > * {
-    color: #A7A7A7;
-  }
-
-  /* Firefox dark mode overrides */
-  @-moz-document url-prefix() {
-    body {
-      background-color: #23222b;
-    }
-    section:not(:first-of-type) {
-      border-color: #4e4d54;
-    }
-    section.group > p,
-    section.group > section > * {
-      color: rgb(191, 191, 201);
-    }
-  }
-
-  /* Safari dark mode overrides */
-  body.macOS.safari p {
-    color: rgb(184, 184, 184) !important;
-  }
   body.iOS.safari {
     background-color: rgb(0, 0, 0);
   }
-  body.iOS.safari form > section {
+  body.iOS.safari .master-toggle,
+  body.iOS.safari .search-wrap,
+  body.iOS.safari form > section.group.labelled,
+  body.iOS.safari form > section.experiments-wrap {
     background-color: rgb(28, 28, 30);
+    border-color: rgba(255,255,255,.1);
   }
-  body.iOS.safari form > section.labelled > label {
+  body.iOS.safari form > section.labelled > label:not(.checkbox) {
     color: rgb(115, 115, 121);
   }
   body.iOS.safari section.group section {
@@ -550,6 +1245,44 @@ body.iOS.safari .checkbox input:focus + .toggle {
   }
 }
 
+/* ================================================================== */
+/* Search match highlight                                              */
+/* ================================================================== */
+mark.cpft_search_mark {
+  background: var(--accent-glow);
+  color: inherit;
+  border-radius: 0;
+  padding: 0 2px;
+}
+.cpft_tab_chip {
+  display: none;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid var(--accent);
+  padding: 2px 6px;
+  border-radius: 2px;
+  margin-left: 8px;
+  vertical-align: middle;
+  font-weight: 500;
+}
+body.searching:not(.safari) .cpft_tab_chip {
+  display: inline-block;
+}
+
 .mb-0 {
   margin-bottom: 0 !important;
+}
+
+.icon {
+  height: 1.25rem;
+}
+body.macOS.safari .icon {
+  display: none;
+}
+body.iOS.safari .icon {
+  height: 1.75rem;
 }

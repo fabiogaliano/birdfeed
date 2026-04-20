@@ -8,20 +8,96 @@
 </head>
 <body>
   <form>
-    <section class="group">
-      <label class="checkbox" style="align-items: center;">
-        <span style="display: flex; align-items: center; gap: .5em;">
-          <img src="options-icon.png" class="icon">
+    <div class="app-brand" aria-hidden="false">
+      <div class="brand-text">
+        <img src="options-icon.png" class="brand-icon" alt="">
+        <span class="brand-name">Control Panel<em>X</em></span>
+      </div>
+      <div class="brand-status">
+        <span class="master-status" aria-hidden="true"></span>
+        <span class="status-label" aria-live="polite"></span>
+      </div>
+      <div class="brand-version" id="version"><span id="versionText"></span><span id="debugCountdown"></span></div>
+    </div>
+
+    <section class="group master-section">
+      <label class="checkbox master-toggle">
+        <span class="master-label">
           <span id="enabled">Enabled</span>
         </span>
         <input type="checkbox" name="enabled">
         <span class="toggle"></span>
       </label>
     </section>
+
     <section id="searchSection">
-      <input type="search" id="searchInput" placeholder="Search options" autocomplete="off">
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/>
+          <path d="M20 20l-3.5-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input type="search" id="searchInput" placeholder="Search all options" autocomplete="off">
+        <kbd class="search-kbd" id="searchKbd">/</kbd>
+        <span class="search-count" id="searchCount" hidden></span>
+      </div>
     </section>
-    <section class="group labelled">
+
+    <div class="tab-bar-wrap" id="tabBarWrap">
+      <button type="button" class="tab-scroll tab-scroll-left" aria-label="Scroll tabs left" tabindex="-1">
+        <svg viewBox="0 0 24 24" aria-hidden="true" width="14" height="14"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <nav class="tab-bar" role="tablist" id="tabBar" aria-label="Settings sections">
+        <button type="button" class="tab" data-tab="timeline" role="tab" aria-selected="true">
+          <span class="tab-num">01</span><span class="tab-label">Timeline</span>
+        </button>
+        <button type="button" class="tab" data-tab="behavior" role="tab" aria-selected="false">
+          <span class="tab-num">02</span><span class="tab-label">Behavior</span>
+        </button>
+        <button type="button" class="tab" data-tab="xfixes" role="tab" aria-selected="false">
+          <span class="tab-num">03</span><span class="tab-label">X Fixes</span>
+        </button>
+        <button type="button" class="tab" data-tab="appearance" role="tab" aria-selected="false">
+          <span class="tab-num">04</span><span class="tab-label">Appearance</span>
+        </button>
+        <button type="button" class="tab" data-tab="navigation" role="tab" aria-selected="false">
+          <span class="tab-num">05</span><span class="tab-label">Navigation</span>
+        </button>
+        <button type="button" class="tab" data-tab="advanced" role="tab" aria-selected="false">
+          <span class="tab-num">06</span><span class="tab-label">Advanced</span>
+        </button>
+        <span class="tab-indicator" aria-hidden="true"></span>
+      </nav>
+      <button type="button" class="tab-scroll tab-scroll-right" aria-label="Scroll tabs right" tabindex="-1">
+        <svg viewBox="0 0 24 24" aria-hidden="true" width="14" height="14"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <div class="tab-intro" data-for-tab="timeline">
+      <span class="tab-intro-eyebrow">01 — Timeline</span>
+      <p class="tab-intro-body">Chronological feed. Algorithmic content removal. Engagement controls.</p>
+    </div>
+    <div class="tab-intro" data-for-tab="behavior" hidden>
+      <span class="tab-intro-eyebrow">02 — Behavior</span>
+      <p class="tab-intro-body">Interaction tweaks across blocks, notifications, and search defaults.</p>
+    </div>
+    <div class="tab-intro" data-for-tab="xfixes" hidden>
+      <span class="tab-intro-eyebrow">03 — X Fixes</span>
+      <p class="tab-intro-body">Revert post-acquisition changes. Restore Twitter branding. Remove Grok &amp; Premium noise.</p>
+    </div>
+    <div class="tab-intro" data-for-tab="appearance" hidden>
+      <span class="tab-intro-eyebrow">04 — Appearance</span>
+      <p class="tab-intro-body">Typography, density, and sidebar controls.</p>
+    </div>
+    <div class="tab-intro" data-for-tab="navigation" hidden>
+      <span class="tab-intro-eyebrow">05 — Navigation</span>
+      <p class="tab-intro-body">Toggle navigation and menu items across desktop and mobile.</p>
+    </div>
+    <div class="tab-intro" data-for-tab="advanced" hidden>
+      <span class="tab-intro-eyebrow">06 — Advanced</span>
+      <p class="tab-intro-body">Custom CSS. Experiments. Diagnostics.</p>
+    </div>
+
+    <section class="group labelled" data-tab="timeline">
       <label id="homeTimelineOptionsLabel">
         Home timeline
       </label>
@@ -131,7 +207,141 @@
       </section>
     </section>
 
-    <section class="group labelled">
+    <section class="group labelled" data-tab="timeline">
+      <label id="reduceAlgorithmicContentOptionsLabel">Remove algorithmic content</label>
+      <section class="checkbox">
+        <label>
+          <span id="hideExplorePageContentsLabel">Hide Explore page contents and use it only for searching</span>
+          <input type="checkbox" name="hideExplorePageContents">
+          <span class="toggle"></span>
+        </label>
+      </section>
+      <section class="checkbox">
+        <label>
+          <span id="hideDiscoverSuggestionsLabel">Hide "Discover" suggestions</span>
+          <input type="checkbox" name="hideMoreTweets">
+          <span class="toggle"></span>
+        </label>
+      </section>
+    </section>
+
+    <section class="group labelled" data-tab="timeline">
+      <label id="reduceEngagementOptionsLabel">
+        Reduce "engagement"
+      </label>
+      <section class="checkbox">
+        <label>
+          <span id="hideMetricsLabel">Hide metrics</span>
+          <input type="checkbox" name="hideMetrics">
+          <span class="toggle"></span>
+        </label>
+        <section class="group hidingMetrics">
+          <label class="checkbox">
+            <span id="hideAllMetricsLabel">Hide all</span>
+            <input type="checkbox" name="hideAllMetrics">
+            <span class="toggle"></span>
+          </label>
+          <section class="checkbox">
+            <label>
+              <span id="hideReplyMetricsLabel">Replies</span>
+              <input type="checkbox" name="hideReplyMetrics">
+              <span class="toggle"></span>
+            </label>
+          </section>
+          <section class="checkbox">
+            <label>
+              <span id="hideRetweetMetricsLabel">Retweets</span>
+              <input type="checkbox" name="hideRetweetMetrics">
+              <span class="toggle"></span>
+            </label>
+          </section>
+          <section class="checkbox">
+            <label>
+              <span id="hideQuoteTweetMetricsLabel">Quote tweets</span>
+              <input type="checkbox" name="hideQuoteTweetMetrics">
+              <span class="toggle"></span>
+            </label>
+          </section>
+          <section class="checkbox">
+            <label>
+              <span id="hideLikeMetricsLabel">Likes</span>
+              <input type="checkbox" name="hideLikeMetrics">
+              <span class="toggle"></span>
+            </label>
+          </section>
+          <section class="checkbox">
+            <label>
+              <span id="hideBookmarkMetricsLabel">Bookmarks</span>
+              <input type="checkbox" name="hideBookmarkMetrics">
+              <span class="toggle"></span>
+            </label>
+         </section>
+          <section class="checkbox">
+            <label>
+              <span id="hideFollowingMetricsLabel">Following / followers</span>
+              <input type="checkbox" name="hideFollowingMetrics">
+              <span class="toggle"></span>
+            </label>
+          </section>
+          <section class="checkbox">
+            <label>
+              <span id="hideProfileHeaderMetricsLabel">Profile header metrics</span>
+              <input type="checkbox" name="hideTotalTweetsMetrics">
+              <span class="toggle"></span>
+            </label>
+          </section>
+        </section>
+      </section>
+      <section class="checkbox">
+        <label>
+          <span id="reducedInteractionModeLabel">Reduced interaction mode</span>
+          <input type="checkbox" name="reducedInteractionMode">
+          <span class="toggle"></span>
+        </label>
+        <p id="reducedInteractionModeInfo">
+          Hide the action bar under tweets &ndash; replies are now the only means of interacting
+        </p>
+      </section>
+      <section class="checkbox">
+        <label>
+          <span id="hideComposeTweetLabel">Hide the Compose Tweet button</span>
+          <input type="checkbox" name="hideComposeTweet">
+          <span class="toggle"></span>
+        </label>
+      </section>
+      <section class="checkbox">
+        <label>
+          <span id="disableHomeTimelineLabel">Disable the home timeline</span>
+          <input type="checkbox" name="disableHomeTimeline">
+          <span class="toggle"></span>
+        </label>
+        <p id="disableHomeTimelineInfo">
+          <span>Find yourself wasting too much time on Twitter? Try preventing use of the home timeline</span>
+        </p>
+        <section class="select disabledHomeTimeline">
+          <label>
+            <span id="disabledHomeTimelineRedirectLabel">Redirect home timeline to</span>
+            <select name="disabledHomeTimelineRedirect">
+              <option value="notifications" class="notificationsLabel" id="disabledHomeTimelineRedirectOption_notifications">Notifications</option>
+              <option value="messages" id="disabledHomeTimelineRedirectOption_messages">Messages</option>
+              <option value="i/bookmarks" id="disabledHomeTimelineRedirectOption_bookmarks">Bookmarks</option>
+            </select>
+          </label>
+        </section>
+      </section>
+      <section class="select">
+        <label>
+          <span class="notificationsLabel">Notifications</span>
+          <select name="hideNotifications">
+            <option value="ignore">Do nothing</option>
+            <option value="badges">Hide badges only</option>
+            <option value="hide">Hide</option>
+          </select>
+        </label>
+      </section>
+    </section>
+
+    <section class="group labelled" data-tab="behavior">
       <label id="uiImprovementsOptionsLabel">UI improvements</label>
       <section class="checkbox mobile">
         <label>
@@ -218,7 +428,7 @@
       </section>
     </section>
 
-    <section class="group labelled">
+    <section class="group labelled" data-tab="xfixes">
       <label id="xFixesLabel">X fixes</label>
       <section class="checkbox">
         <label>
@@ -466,7 +676,7 @@
       </section>
     </section>
 
-    <section class="group labelled">
+    <section class="group labelled" data-tab="appearance">
       <label id="uiTweaksOptionsLabel">
         UI tweaks
       </label>
@@ -540,7 +750,7 @@
       </section>
     </section>
 
-    <section class="group labelled desktop">
+    <section class="group labelled desktop" data-tab="appearance">
       <label id="sidebarLabel">Sidebar</label>
       <section class="checkbox desktop">
         <label>
@@ -586,141 +796,7 @@
       </section>
     </section>
 
-    <section class="group labelled">
-      <label id="reduceAlgorithmicContentOptionsLabel">Remove algorithmic content</label>
-      <section class="checkbox">
-        <label>
-          <span id="hideExplorePageContentsLabel">Hide Explore page contents and use it only for searching</span>
-          <input type="checkbox" name="hideExplorePageContents">
-          <span class="toggle"></span>
-        </label>
-      </section>
-      <section class="checkbox">
-        <label>
-          <span id="hideDiscoverSuggestionsLabel">Hide "Discover" suggestions</span>
-          <input type="checkbox" name="hideMoreTweets">
-          <span class="toggle"></span>
-        </label>
-      </section>
-    </section>
-
-    <section class="group labelled">
-      <label id="reduceEngagementOptionsLabel">
-        Reduce "engagement"
-      </label>
-      <section class="checkbox">
-        <label>
-          <span id="hideMetricsLabel">Hide metrics</span>
-          <input type="checkbox" name="hideMetrics">
-          <span class="toggle"></span>
-        </label>
-        <section class="group hidingMetrics">
-          <label class="checkbox">
-            <span id="hideAllMetricsLabel">Hide all</span>
-            <input type="checkbox" name="hideAllMetrics">
-            <span class="toggle"></span>
-          </label>
-          <section class="checkbox">
-            <label>
-              <span id="hideReplyMetricsLabel">Replies</span>
-              <input type="checkbox" name="hideReplyMetrics">
-              <span class="toggle"></span>
-            </label>
-          </section>
-          <section class="checkbox">
-            <label>
-              <span id="hideRetweetMetricsLabel">Retweets</span>
-              <input type="checkbox" name="hideRetweetMetrics">
-              <span class="toggle"></span>
-            </label>
-          </section>
-          <section class="checkbox">
-            <label>
-              <span id="hideQuoteTweetMetricsLabel">Quote tweets</span>
-              <input type="checkbox" name="hideQuoteTweetMetrics">
-              <span class="toggle"></span>
-            </label>
-          </section>
-          <section class="checkbox">
-            <label>
-              <span id="hideLikeMetricsLabel">Likes</span>
-              <input type="checkbox" name="hideLikeMetrics">
-              <span class="toggle"></span>
-            </label>
-          </section>
-          <section class="checkbox">
-            <label>
-              <span id="hideBookmarkMetricsLabel">Bookmarks</span>
-              <input type="checkbox" name="hideBookmarkMetrics">
-              <span class="toggle"></span>
-            </label>
-         </section>
-          <section class="checkbox">
-            <label>
-              <span id="hideFollowingMetricsLabel">Following / followers</span>
-              <input type="checkbox" name="hideFollowingMetrics">
-              <span class="toggle"></span>
-            </label>
-          </section>
-          <section class="checkbox">
-            <label>
-              <span id="hideProfileHeaderMetricsLabel">Profile header metrics</span>
-              <input type="checkbox" name="hideTotalTweetsMetrics">
-              <span class="toggle"></span>
-            </label>
-          </section>
-        </section>
-      </section>
-      <section class="checkbox">
-        <label>
-          <span id="reducedInteractionModeLabel">Reduced interaction mode</span>
-          <input type="checkbox" name="reducedInteractionMode">
-          <span class="toggle"></span>
-        </label>
-        <p id="reducedInteractionModeInfo">
-          Hide the action bar under tweets &ndash; replies are now the only means of interacting
-        </p>
-      </section>
-      <section class="checkbox">
-        <label>
-          <span id="hideComposeTweetLabel">Hide the Compose Tweet button</span>
-          <input type="checkbox" name="hideComposeTweet">
-          <span class="toggle"></span>
-        </label>
-      </section>
-      <section class="checkbox">
-        <label>
-          <span id="disableHomeTimelineLabel">Disable the home timeline</span>
-          <input type="checkbox" name="disableHomeTimeline">
-          <span class="toggle"></span>
-        </label>
-        <p id="disableHomeTimelineInfo">
-          <span>Find yourself wasting too much time on Twitter? Try preventing use of the home timeline</span>
-        </p>
-        <section class="select disabledHomeTimeline">
-          <label>
-            <span id="disabledHomeTimelineRedirectLabel">Redirect home timeline to</span>
-            <select name="disabledHomeTimelineRedirect">
-              <option value="notifications" class="notificationsLabel" id="disabledHomeTimelineRedirectOption_notifications">Notifications</option>
-              <option value="messages" id="disabledHomeTimelineRedirectOption_messages">Messages</option>
-              <option value="i/bookmarks" id="disabledHomeTimelineRedirectOption_bookmarks">Bookmarks</option>
-            </select>
-          </label>
-        </section>
-      </section>
-      <section class="select">
-        <label>
-          <span class="notificationsLabel">Notifications</span>
-          <select name="hideNotifications">
-            <option value="ignore">Do nothing</option>
-            <option value="badges">Hide badges only</option>
-            <option value="hide">Hide</option>
-          </select>
-        </label>
-      </section>
-    </section>
-
-    <section class="group labelled">
+    <section class="group labelled" data-tab="navigation">
       <label id="hideUnusedUiItemsOptionsLabel">
         Hide UI items you don't use
       </label>
@@ -844,7 +920,8 @@
         </label>
       </section>
     </section>
-    <section class="group labelled">
+
+    <section class="group labelled" data-tab="navigation">
       <label>
         <span id="hideMoreSlideOutMenuItemsOptionsLabel_desktop" class="desktop">Hide "More" menu items you don't use</span>
         <span id="hideMoreSlideOutMenuItemsOptionsLabel_mobile" class="mobile">Hide slide-out menu items you don't use</span>
@@ -907,8 +984,8 @@
       </section>
     </section>
 
-    <section>
-      <details id="experiments">
+    <section data-tab="advanced" class="experiments-wrap">
+      <details id="experiments" open>
         <summary id="experimentsOptionsLabel">
           Experiments
         </summary>
@@ -922,7 +999,7 @@
       </details>
     </section>
 
-    <section class="group labelled debug">
+    <section class="group labelled debug" data-tab="advanced">
       <label id="debugOptionsLabel">Debug options</label>
       <section class="checkbox">
         <label>
@@ -946,8 +1023,6 @@
         </label>
       </section>
     </section>
-
-    <div id="version">v4.22.2<span id="debugCountdown"></span></div>
   </form>
   <script src="options.js"></script>
 </body>

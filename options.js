@@ -355,7 +355,7 @@ let $showBlueReplyFollowersCountLabel = /** @type {HTMLElement} */ (document.que
 //#region Utility functions
 function exportConfig() {
   let $a = document.createElement('a')
-  $a.download = 'birdfeed-v4.22.2.config.txt'
+  $a.download = `birdfeed-v${chrome.runtime.getManifest().version}.config.txt`
   $a.href = URL.createObjectURL(new Blob([
     JSON.stringify(optionsConfig, null, 2)
   ], {type: 'text/plain'}))
@@ -596,41 +596,174 @@ function updateMutedQuotesDisplay() {
   })
 }
 
+const TAB_LABELS = {
+  timeline: 'Timeline',
+  behavior: 'Behavior',
+  xfixes: 'X Fixes',
+  appearance: 'Appearance',
+  navigation: 'Navigation',
+  advanced: 'Advanced',
+}
+
+const DEFAULT_TAB = 'timeline'
+
+function setupTabs() {
+  let $wrap = /** @type {HTMLElement|null} */ (document.querySelector('.tab-bar-wrap'))
+  let $bar = /** @type {HTMLElement|null} */ (document.querySelector('.tab-bar'))
+  let $tabs = /** @type {NodeListOf<HTMLButtonElement>} */ (
+    document.querySelectorAll('.tab-bar .tab')
+  )
+  if (!$tabs.length || !$bar || !$wrap) return
+
+  /** @param {string} tab */
+  function activate(tab) {
+    if (!TAB_LABELS[tab]) tab = DEFAULT_TAB
+    for (let key of Object.keys(TAB_LABELS)) {
+      $body.classList.toggle(`tab-${key}`, key == tab)
+    }
+    for (let $tab of $tabs) {
+      let selected = $tab.dataset.tab == tab
+      $tab.setAttribute('aria-selected', String(selected))
+      if (selected) {
+        // Bring the active tab into view on narrow layouts
+        $tab.scrollIntoView({block: 'nearest', inline: 'nearest', behavior: 'smooth'})
+      }
+    }
+  }
+
+  for (let $tab of $tabs) {
+    $tab.addEventListener('click', () => activate($tab.dataset.tab))
+  }
+
+  // Overflow-aware scroll arrows: only visible when there is more to scroll.
+  function updateArrows() {
+    let canLeft = $bar.scrollLeft > 1
+    let canRight = $bar.scrollLeft + $bar.clientWidth < $bar.scrollWidth - 1
+    $wrap.classList.toggle('has-scroll-left', canLeft)
+    $wrap.classList.toggle('has-scroll-right', canRight)
+  }
+  $bar.addEventListener('scroll', updateArrows, {passive: true})
+  window.addEventListener('resize', updateArrows)
+
+  let $left = $wrap.querySelector('.tab-scroll-left')
+  let $right = $wrap.querySelector('.tab-scroll-right')
+  $left?.addEventListener('click', () => $bar.scrollBy({left: -180, behavior: 'smooth'}))
+  $right?.addEventListener('click', () => $bar.scrollBy({left: 180, behavior: 'smooth'}))
+
+  activate(DEFAULT_TAB)
+  updateArrows()
+}
+
+/**
+ * Annotate every searchable row with its tab chip (hidden unless searching) and
+ * cache its normalized search text for fast filtering.
+ */
+function annotateSearchableRows() {
+  let $groups = /** @type {NodeListOf<HTMLElement>} */ (
+    document.querySelectorAll('form > [data-tab]')
+  )
+  for (let $group of $groups) {
+    let tab = $group.dataset.tab
+    let label = TAB_LABELS[tab] || tab
+    let $rows = /** @type {NodeListOf<HTMLElement>} */ (
+      $group.querySelectorAll(':scope > section, :scope > details, :scope > p')
+    )
+    for (let $row of $rows) {
+      let $primary = /** @type {HTMLElement|null} */ (
+        $row.querySelector(':scope > label > span:first-of-type, :scope > summary > span:first-of-type')
+      )
+      if ($primary && !$primary.parentElement.querySelector('.cpft_tab_chip')) {
+        let $chip = document.createElement('span')
+        $chip.className = 'cpft_tab_chip'
+        $chip.textContent = label
+        $primary.after($chip)
+      }
+    }
+  }
+}
+
+function computeRowSearchText($row) {
+  let clone = $row.cloneNode(true)
+  clone.querySelectorAll('.cpft_tab_chip').forEach(n => n.remove())
+  return (clone.textContent || '').toLowerCase()
+}
+
 function setupOptionsSearch() {
   let $input = /** @type {HTMLInputElement} */ (document.querySelector('#searchInput'))
   if (!$input) return
 
-  // Only the labelled groups are filterable; the first (Enabled) group is not.
+  annotateSearchableRows()
+
   let $groups = /** @type {NodeListOf<HTMLElement>} */ (
-    document.querySelectorAll('form > section.group.labelled')
+    document.querySelectorAll('form > section.group.labelled, form > section.experiments-wrap')
   )
+  let $count = /** @type {HTMLElement|null} */ (document.querySelector('#searchCount'))
+  let $kbd = /** @type {HTMLElement|null} */ (document.querySelector('#searchKbd'))
 
   let HIDDEN = 'cpft_hidden_by_search'
 
+  let rowText = new WeakMap()
+  for (let $group of $groups) {
+    for (let $row of $group.querySelectorAll(':scope > section, :scope > details, :scope > p')) {
+      rowText.set($row, computeRowSearchText(/** @type {HTMLElement} */ ($row)))
+    }
+  }
+
   function apply() {
     let query = $input.value.trim().toLowerCase()
+    let searching = Boolean(query)
+    $body.classList.toggle('searching', searching)
+
+    let matchCount = 0
     for (let $group of $groups) {
       let anyVisible = false
-      // Direct child rows of the group — each is one option (or a nested <details>)
       let $rows = /** @type {NodeListOf<HTMLElement>} */ (
         $group.querySelectorAll(':scope > section, :scope > details, :scope > p')
       )
       for (let $row of $rows) {
-        let text = ($row.textContent || '').toLowerCase()
+        let text = rowText.get($row) || ''
         let match = !query || text.includes(query)
         $row.classList.toggle(HIDDEN, !match)
-        if (match) anyVisible = true
+        if (match) {
+          anyVisible = true
+          if (searching) matchCount++
+        }
       }
-      $group.classList.toggle(HIDDEN, Boolean(query) && !anyVisible)
+      $group.classList.toggle(HIDDEN, searching && !anyVisible)
+    }
+
+    if ($count) {
+      if (searching) {
+        $count.hidden = false
+        $count.textContent = `${matchCount} result${matchCount == 1 ? '' : 's'}`
+      } else {
+        $count.hidden = true
+        $count.textContent = ''
+      }
+    }
+    if ($kbd) {
+      $kbd.style.visibility = searching ? 'hidden' : ''
     }
   }
 
   $input.addEventListener('input', apply)
-  // Clear filter on Escape
   $input.addEventListener('keydown', (e) => {
     if (e.key == 'Escape' && $input.value) {
       $input.value = ''
       apply()
+      e.stopPropagation()
+    }
+  })
+
+  // Global `/` shortcut focuses the search input
+  document.addEventListener('keydown', (e) => {
+    if (e.key == '/' && document.activeElement !== $input &&
+        !(e.target instanceof HTMLInputElement) &&
+        !(e.target instanceof HTMLTextAreaElement) &&
+        !(e.target instanceof HTMLSelectElement)) {
+      e.preventDefault()
+      $input.focus()
+      $input.select()
     }
   })
 }
@@ -666,13 +799,18 @@ function main() {
     optionsConfig = {...defaultConfig, ...storedConfig}
 
     $body.classList.toggle('debug', optionsConfig.debug === true)
-    $experiments.open = Boolean(optionsConfig.customCss)
+    $experiments.open = true
     $exportConfig.addEventListener('click', exportConfig)
     $form.addEventListener('change', onFormChanged)
     $hideQuotesFromDetails.addEventListener('toggle', updateHideQuotesFromDisplay)
     $mutedQuotesDetails.addEventListener('toggle', updateMutedQuotesDisplay)
     $saveCustomCssButton.addEventListener('click', saveCustomCss)
+    setupTabs()
     setupOptionsSearch()
+    let $versionText = document.querySelector('#versionText')
+    if ($versionText) {
+      $versionText.textContent = `v${chrome.runtime.getManifest().version}`
+    }
     chrome.storage.onChanged.addListener(onStorageChanged)
 
     if (!optionsConfig.debug) {
