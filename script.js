@@ -184,6 +184,7 @@ const config = {
   quoteTweets: 'ignore',
   redirectChatNav: false,
   redirectToTwitter: false,
+  redirectTwitterLinks: '',
   reducedInteractionMode: false,
   replaceLogo: true,
   restoreLinkHeadlines: true,
@@ -233,6 +234,45 @@ const config = {
   preventNextVideoAutoplay: true,
 }
 //#endregion
+
+/** Tracking parameters Twitter appends to URLs for analytics */
+const TRACKING_PARAMS = ['s', 't', 'ref_src', 'ref_url', 'src', 'cxt', 'vertical', 'mx']
+
+/**
+ * @param {string} urlString
+ * @param {string | null} targetDomain
+ * @returns {string}
+ */
+function cleanTwitterUrl(urlString, targetDomain) {
+  try {
+    let url = new URL(urlString)
+    for (let param of TRACKING_PARAMS) {
+      url.searchParams.delete(param)
+    }
+    let search = url.searchParams.toString()
+    let domain = targetDomain || url.hostname
+    return `https://${domain}${url.pathname}${search ? '?' + search : ''}${url.hash}`
+  } catch (e) {
+    return urlString
+  }
+}
+
+document.addEventListener('copy', function(e) {
+  if (!config.enabled || !config.redirectTwitterLinks) return
+
+  let selection = window.getSelection()?.toString() || ''
+  let urlPattern = /https?:\/\/(www\.)?(twitter\.com|x\.com|mobile\.twitter\.com|mobile\.x\.com)(\/[^\s]*)?/gi
+
+  if (urlPattern.test(selection)) {
+    urlPattern.lastIndex = 0
+    let targetDomain = config.redirectTwitterLinks.trim().replace(/^https?:\/\//, '')
+    let newText = selection.replace(urlPattern, (match) => cleanTwitterUrl(match, targetDomain))
+    if (newText !== selection) {
+      e.preventDefault()
+      e.clipboardData?.setData('text/plain', newText)
+    }
+  }
+}, true)
 
 //#region Locales
 /**
