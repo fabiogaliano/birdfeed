@@ -1254,25 +1254,6 @@ mark.cpft_search_mark {
   border-radius: 0;
   padding: 0 2px;
 }
-.cpft_tab_chip {
-  display: none;
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  color: var(--accent);
-  background: transparent;
-  border: 1px solid var(--accent);
-  padding: 2px 6px;
-  border-radius: 2px;
-  margin-left: 8px;
-  vertical-align: middle;
-  font-weight: 500;
-}
-body.searching:not(.safari) .cpft_tab_chip {
-  display: inline-block;
-}
-
 .mb-0 {
   margin-bottom: 0 !important;
 }

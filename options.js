@@ -654,45 +654,13 @@ function setupTabs() {
   updateArrows()
 }
 
-/**
- * Annotate every searchable row with its tab chip (hidden unless searching) and
- * cache its normalized search text for fast filtering.
- */
-function annotateSearchableRows() {
-  let $groups = /** @type {NodeListOf<HTMLElement>} */ (
-    document.querySelectorAll('form > [data-tab]')
-  )
-  for (let $group of $groups) {
-    let tab = $group.dataset.tab
-    let label = TAB_LABELS[tab] || tab
-    let $rows = /** @type {NodeListOf<HTMLElement>} */ (
-      $group.querySelectorAll(':scope > section, :scope > details, :scope > p')
-    )
-    for (let $row of $rows) {
-      let $primary = /** @type {HTMLElement|null} */ (
-        $row.querySelector(':scope > label > span:first-of-type, :scope > summary > span:first-of-type')
-      )
-      if ($primary && !$primary.parentElement.querySelector('.cpft_tab_chip')) {
-        let $chip = document.createElement('span')
-        $chip.className = 'cpft_tab_chip'
-        $chip.textContent = label
-        $primary.after($chip)
-      }
-    }
-  }
-}
-
 function computeRowSearchText($row) {
-  let clone = $row.cloneNode(true)
-  clone.querySelectorAll('.cpft_tab_chip').forEach(n => n.remove())
-  return (clone.textContent || '').toLowerCase()
+  return ($row.textContent || '').toLowerCase()
 }
 
 function setupOptionsSearch() {
   let $input = /** @type {HTMLInputElement} */ (document.querySelector('#searchInput'))
   if (!$input) return
-
-  annotateSearchableRows()
 
   let $groups = /** @type {NodeListOf<HTMLElement>} */ (
     document.querySelectorAll('form > section.group.labelled, form > section.experiments-wrap')
