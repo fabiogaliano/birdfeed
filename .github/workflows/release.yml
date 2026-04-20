@@ -17,7 +17,11 @@ jobs:
         with:
           node-version: '20'
 
-      - run: npm ci
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
 
       - name: Build extensions
         run: node scripts/build.js
