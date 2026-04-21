@@ -34,5 +34,3 @@ Please include:
 ## Attribution
 
 Birdfeed is built on the work of [insin](https://github.com/insin) and all original [Control Panel for Twitter](https://github.com/insin/control-panel-for-twitter) contributors.
-
-Icon adapted from "Ibis icon" by [Delapouite](https://delapouite.com/) from [game-icons.net](https://game-icons.net), [CC 3.0 BY](https://creativecommons.org/licenses/by/3.0/)
