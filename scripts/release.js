@@ -3,10 +3,9 @@ const {execSync, execFileSync} = require('child_process')
 
 const semver = require('semver')
 
-const manifestPaths = ['./manifest.mv2.json', './manifest.mv3.json', './Safari/Shared (Extension)/Resources/manifest.json']
+const manifestPaths = ['./manifest.mv2.json', './manifest.mv3.json', './safari/Shared (Extension)/Resources/manifest.json']
 const optionsJsPath = './options.js'
-const optionsHtmlPath = './options.html'
-const safariProjectPath = './Safari/Birdfeed.xcodeproj/project.pbxproj'
+const safariProjectPath = './safari/Birdfeed.xcodeproj/project.pbxproj'
 
 let releaseType = process.argv[2]
 
@@ -38,13 +37,6 @@ fs.writeFileSync(
 )
 
 fs.writeFileSync(
-  optionsHtmlPath,
-  fs.readFileSync(optionsHtmlPath, {encoding: 'utf8'})
-    .replace(/id="version">[^<]+</, `id="version">v${nextVersion}<`),
-  {encoding: 'utf8'}
-)
-
-fs.writeFileSync(
   safariProjectPath,
   fs.readFileSync(safariProjectPath, {encoding: 'utf8'})
     .replace(/CURRENT_PROJECT_VERSION = (\d+)/g, (_, current) => `CURRENT_PROJECT_VERSION = ${Number(current) + 1}`)
@@ -60,7 +52,6 @@ execFileSync('git', [
   'add',
   ...manifestPaths,
   optionsJsPath,
-  optionsHtmlPath,
   safariProjectPath,
 ], {stdio: 'inherit'})
 execSync(`git commit -m "Release v${nextVersion}"`, {stdio: 'inherit'})
