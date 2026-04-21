@@ -355,7 +355,7 @@ let $showBlueReplyFollowersCountLabel = /** @type {HTMLElement} */ (document.que
 //#region Utility functions
 function exportConfig() {
   let $a = document.createElement('a')
-  $a.download = `birdfeed-v${chrome.runtime.getManifest().version}.config.txt`
+  $a.download = `birdfeed-v4.23.1.config.txt`
   $a.href = URL.createObjectURL(new Blob([
     JSON.stringify(optionsConfig, null, 2)
   ], {type: 'text/plain'}))
