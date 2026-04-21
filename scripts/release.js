@@ -1,5 +1,5 @@
 const fs = require('fs')
-const {execSync} = require('child_process')
+const {execSync, execFileSync} = require('child_process')
 
 const semver = require('semver')
 
@@ -54,14 +54,15 @@ fs.writeFileSync(
 
 console.log(`Bumped to v${nextVersion}`)
 
-const filesToCommit = [
+// execFileSync avoids a shell — paths with spaces or parens (e.g. the Safari
+// "Shared (Extension)" directory) would otherwise break string interpolation.
+execFileSync('git', [
+  'add',
   ...manifestPaths,
   optionsJsPath,
   optionsHtmlPath,
   safariProjectPath,
-].join(' ')
-
-execSync(`git add ${filesToCommit}`, {stdio: 'inherit'})
+], {stdio: 'inherit'})
 execSync(`git commit -m "Release v${nextVersion}"`, {stdio: 'inherit'})
 execSync(`git tag v${nextVersion}`, {stdio: 'inherit'})
 execSync('git push', {stdio: 'inherit'})
