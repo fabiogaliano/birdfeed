@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Birdfeed options - palette prototype</title>
+<style>
+/* ==================================================================
+   Prototype only. Each variant is a scope that redefines the same
+   token names the real options.css uses, so a panel here is a fair
+   preview of what changing :root would actually do.
+   ================================================================== */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 32px 24px 64px;
+  background: #17171a;
+  color: #e8e8ea;
+  font: 13px/1.5 ui-sans-serif, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 { font-size: 15px; font-weight: 600; letter-spacing: -.01em; margin: 0 0 4px; }
+h2 {
+  font: 500 10px/1 ui-monospace, "SFMono-Regular", Menlo, monospace;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: #8a8a90; margin: 40px 0 4px;
+}
+.sub { color: #8a8a90; font-size: 12px; margin: 0 0 20px; max-width: 70ch; }
+
+.row { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+.variant { flex: 1 1 300px; min-width: 300px; max-width: 400px; }
+
+.variant > .cap {
+  display: flex; align-items: baseline; gap: 8px;
+  margin: 0 0 8px; padding: 0 2px;
+}
+.cap .name { font-size: 12px; font-weight: 600; }
+.cap .hex {
+  font: 400 10px/1 ui-monospace, Menlo, monospace;
+  letter-spacing: .06em; color: #75757b;
+}
+.cap .rec {
+  font: 500 9px/1 ui-monospace, Menlo, monospace;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: #4ade80; border: 1px solid #4ade8055;
+  border-radius: 3px; padding: 3px 5px;
+}
+
+/* ==================================================================
+   The panel - mirrors the real options page structure
+   ================================================================== */
+.panel {
+  --font-body: ui-sans-serif, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --ease-out: cubic-bezier(.2, .7, .2, 1);
+
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  font-family: var(--font-body);
+  color: var(--fg);
+  box-shadow: var(--panel-shadow, none);
+}
+
+/* Masthead ---------------------------------------------------------- */
+.mast {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--border);
+  padding: 11px 14px;
+}
+.mast .brand {
+  font: 500 10px/1 var(--font-mono);
+  letter-spacing: .16em; text-transform: uppercase;
+  color: var(--fg);
+}
+.mast .brand span { color: var(--fg-faint); }
+.mast .state {
+  display: flex; align-items: center; gap: 7px;
+  font: 500 9px/1 var(--font-mono);
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--fg-muted);
+}
+.dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* Search ------------------------------------------------------------ */
+.search {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 14px; min-height: 40px;
+  background: var(--bg-inset);
+  border-bottom: 1px solid var(--border);
+}
+.search svg { width: 13px; height: 13px; color: var(--fg-faint); flex: none; }
+.search .ph {
+  font: 400 11px/1 var(--font-mono);
+  letter-spacing: .05em; color: var(--fg-faint);
+}
+
+/* Tabs -------------------------------------------------------------- */
+.tabs { display: flex; background: var(--bg-raised); border-bottom: 1px solid var(--border); }
+.tab {
+  flex: 1;
+  position: relative;
+  background: transparent; border: 0;
+  border-left: 1px solid var(--border-soft);
+  padding: 12px 6px;
+  font: 500 9px/1 var(--font-mono);
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--fg-muted);
+  cursor: pointer;
+  transition: color 160ms var(--ease-out), background 160ms var(--ease-out);
+}
+.tab:first-child { border-left: 0; }
+.tab:hover { color: var(--fg-secondary); background: var(--hover); }
+.tab .num { color: var(--fg-faint); margin-right: 5px; }
+.tab[aria-selected="true"] { color: var(--tab-accent, var(--accent)); background: var(--bg); }
+.tab[aria-selected="true"] .num { color: var(--tab-accent, var(--accent)); }
+.tab[aria-selected="true"]::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
+  height: 1px; background: var(--tab-accent, var(--accent));
+}
+
+/* Section eyebrow --------------------------------------------------- */
+.intro { padding: 16px 14px 14px; border-bottom: 1px solid var(--border-soft); }
+.eyebrow {
+  font: 500 9px/1 var(--font-mono);
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--tab-accent, var(--accent));
+  display: block; margin-bottom: 7px;
+}
+.intro p { margin: 0; font-size: 11.5px; color: var(--fg-muted); }
+
+/* Group heading ----------------------------------------------------- */
+.ghead {
+  padding: 16px 14px 7px;
+  font: 500 9px/1 var(--font-mono);
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--fg-faint);
+}
+
+/* Rows -------------------------------------------------------------- */
+.opt {
+  padding: 11px 14px;
+  border-top: 1px solid var(--border-soft);
+  transition: background 140ms var(--ease-out);
+}
+.opt:hover { background: var(--hover); }
+.opt .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.opt .label { font-size: 12.5px; color: var(--fg); }
+.opt .desc {
+  margin: 5px 0 0;
+  font: 400 11px/1.45 var(--font-mono);
+  color: var(--fg-muted);
+  max-width: 46ch;
+}
+
+/* Toggle ------------------------------------------------------------ */
+.sw {
+  position: relative; display: inline-block;
+  width: 30px; height: 17px; flex: none;
+  background: var(--track); border-radius: 999px;
+  cursor: pointer; transition: background 180ms var(--ease-out);
+}
+.sw::after {
+  content: ""; position: absolute; top: 2px; left: 2px;
+  width: 13px; height: 13px; border-radius: 50%;
+  background: var(--thumb);
+  transition: transform 180ms var(--ease-out);
+}
+.sw.on { background: var(--sw-accent, var(--tab-accent, var(--accent))); }
+.sw.on::after { transform: translateX(13px); background: #fff; }
+
+/* Select ------------------------------------------------------------ */
+.sel {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 5px 8px;
+  font: 500 9.5px/1 var(--font-mono);
+  letter-spacing: .09em; text-transform: uppercase;
+  color: var(--fg-secondary);
+  white-space: nowrap;
+}
+.sel .chev { color: var(--fg-faint); }
+
+/* ==================================================================
+   Foundations - the same token names options.css already defines
+   ================================================================== */
+/* Light. On a light surface a hairline border alone reads as a wireframe, so
+   the panel gets a soft shadow and cards go white on a grey page - the
+   "surface colour shift" approach, where colour does the elevation work. */
+.f-light {
+  --bg: #f6f6f7;  --bg-raised: #ffffff;  --bg-inset: #ffffff;
+  --fg: #18181b;  --fg-secondary: #3f3f46;  --fg-muted: #71717a;  --fg-faint: #a1a1aa;
+  --border: #e3e3e6;  --border-soft: #ededf0;
+  --track: #d4d4d8;  --thumb: #ffffff;
+  --hover: rgba(0,0,0,.025);
+  --accent: #1a7fd4;  --accent-glow: rgba(26,127,212,.18);
+  --panel-shadow: 0 0 0 .5px rgba(0,0,0,.04), 0 1px 2px rgba(0,0,0,.04), 0 4px 12px rgba(0,0,0,.05);
+}
+/* Dim - X's own mid theme, the same family as the Dim option the extension
+   already offers for the site itself. */
+.f-dim {
+  --bg: #15202b;  --bg-raised: #1c2732;  --bg-inset: #101a24;
+  --fg: #f7f9f9;  --fg-secondary: #b6c2cd;  --fg-muted: #8b98a5;  --fg-faint: #5f7183;
+  --border: #38444d;  --border-soft: #22303c;
+  --track: #3d4d5c;  --thumb: #d9e1e8;
+  --hover: rgba(255,255,255,.04);
+  --accent: #1d9bf0;  --accent-glow: rgba(29,155,240,.22);
+}
+.f-current {
+  --bg: #000000;  --bg-raised: #000000;  --bg-inset: #141414;
+  --fg: #fafafa;  --fg-secondary: #8a8a8a;  --fg-muted: #8a8a8a;  --fg-faint: #7a7a7a;
+  --border: #2e2e2e;  --border-soft: #1c1c1c;
+  --track: #3a3a3a;  --thumb: #fafafa;
+  --hover: rgba(255,255,255,.035);
+  --accent: #1d9bf0;  --accent-glow: rgba(29,155,240,.28);
+}
+.f-neutral {
+  --bg: #0a0a0b;  --bg-raised: #111113;  --bg-inset: #050506;
+  --fg: #f5f5f6;  --fg-secondary: #a1a1a6;  --fg-muted: #6e6e76;  --fg-faint: #48484f;
+  --border: #232326;  --border-soft: #17171a;
+  --track: #2a2a2e;  --thumb: #d4d4d8;
+  --hover: rgba(255,255,255,.03);
+  --accent: #4a9eff;  --accent-glow: rgba(74,158,255,.22);
+}
+.f-slate {
+  --bg: #0b0d11;  --bg-raised: #12151b;  --bg-inset: #06070a;
+  --fg: #f2f4f7;  --fg-secondary: #9ba3af;  --fg-muted: #68707d;  --fg-faint: #454c57;
+  --border: #21252d;  --border-soft: #171a20;
+  --track: #272c35;  --thumb: #cfd5dd;
+  --hover: rgba(255,255,255,.03);
+  --accent: #4a9eff;  --accent-glow: rgba(74,158,255,.22);
+}
+.f-warm {
+  --bg: #100f0e;  --bg-raised: #171614;  --bg-inset: #0a0908;
+  --fg: #f7f5f3;  --fg-secondary: #a8a29a;  --fg-muted: #736d65;  --fg-faint: #4d4842;
+  --border: #2a2724;  --border-soft: #1d1b19;
+  --track: #2e2b27;  --thumb: #ddd8d2;
+  --hover: rgba(255,255,255,.03);
+  --accent: #4a9eff;  --accent-glow: rgba(74,158,255,.22);
+}
+
+/* ==================================================================
+   Colour strategies
+   ================================================================== */
+/* Per-tab hue: the active tab sets --tab-accent for the whole panel. */
+.c-pertab[data-tab="0"] { --tab-accent: #4a9eff; --accent-glow: rgba(74,158,255,.22); }
+.c-pertab[data-tab="1"] { --tab-accent: #a78bfa; --accent-glow: rgba(167,139,250,.22); }
+.c-pertab[data-tab="2"] { --tab-accent: #38bdf8; --accent-glow: rgba(56,189,248,.22); }
+
+/* Semantic: colour encodes what the setting does, not where it lives. */
+.c-semantic .sw[data-kind="hide"]    { --sw-accent: #f5a524; }
+.c-semantic .sw[data-kind="restore"] { --sw-accent: #4ade80; }
+.c-semantic .sw[data-kind="redirect"]{ --sw-accent: #a78bfa; }
+.c-semantic .legend {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  padding: 10px 14px; border-top: 1px solid var(--border-soft);
+}
+.legend i {
+  display: flex; align-items: center; gap: 5px;
+  font: 500 9px/1 var(--font-mono);
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--fg-muted); font-style: normal;
+}
+.legend i::before {
+  content: ""; width: 7px; height: 7px; border-radius: 2px; background: var(--c);
+}
+.legend { display: none; }
+.c-semantic .legend { display: flex; }
+
+.hint {
+  margin: 10px 2px 0; font-size: 11px; color: #75757b; max-width: 44ch;
+}
+</style>
+</head>
+<body>
+
+<h1>Birdfeed options — palette prototype</h1>
+<p class="sub">Every panel renders the same slice of the real options page. Click the tabs inside a panel; in the per-tab variant the accent follows the section.</p>
+
+<h2>1 — Brightness</h2>
+<p class="sub">The page is currently dark-only, with no light mode at all. Your extension already offers X itself a Dim and a Lights-out theme — the options page could use the same three.</p>
+<div class="row" id="rowBrightness"></div>
+
+<h2>2 — If you stay dark, which cast</h2>
+<p class="sub">Identical structure, identical accent. Only the tint running through every neutral changes.</p>
+<div class="row" id="rowFoundation"></div>
+
+<h2>3 — How colour is used</h2>
+<p class="sub">All three sit on the same near-black foundation, so the only thing changing here is what colour is allowed to mean.</p>
+<div class="row" id="rowColour"></div>
+
+<script>
+const SETTINGS = [
+  {label: 'Use the Following (chronological) timeline by default',
+   desc: 'Opens Following instead of For you every time, so the timeline stays in time order.',
+   on: true, kind: 'restore'},
+  {label: 'Hide the "For you" (algorithmic) timeline',
+   desc: 'Removes the "For you" tab entirely, leaving only Following.',
+   on: true, kind: 'hide'},
+  {label: 'Restore Tweet source label',
+   desc: 'Shows which app a post was sent from. Only appears on a post’s own page.',
+   on: true, kind: 'restore'},
+  {label: 'Redirect to twitter.com',
+   desc: 'Sends x.com addresses back to twitter.com.',
+   on: false, kind: 'redirect'},
+]
+
+const TABS = [['01', 'Timeline'], ['02', 'Behavior'], ['03', 'X Fixes']]
+
+function panel({foundation, colour, tab = 0}) {
+  let el = document.createElement('div')
+  el.className = `panel ${foundation} ${colour}`
+  el.dataset.tab = String(tab)
+  el.innerHTML = `
+    <div class="mast">
+      <div class="brand">Control Panel<span> / X</span></div>
+      <div class="state"><span class="dot"></span> Active</div>
+    </div>
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
+      </svg>
+      <span class="ph">Search all options</span>
+    </div>
+    <div class="tabs">
+      ${TABS.map(([n, t], i) => `
+        <button class="tab" aria-selected="${i === tab}" data-i="${i}">
+          <span class="num">${n}</span>${t}
+        </button>`).join('')}
+    </div>
+    <div class="intro">
+      <span class="eyebrow">${TABS[tab][0]} — ${TABS[tab][1]}</span>
+      <p>Chronological feed. Algorithmic content removal. Engagement controls.</p>
+    </div>
+    <div class="ghead">Home timeline</div>
+    ${SETTINGS.slice(0, 2).map(row).join('')}
+    <div class="ghead">Posts &amp; links</div>
+    ${row(SETTINGS[2])}
+    <div class="opt">
+      <div class="top">
+        <span class="label">Default sorting of replies</span>
+        <span class="sel">Relevant <span class="chev">▾</span></span>
+      </div>
+      <p class="desc">Which order replies open in.</p>
+    </div>
+    ${row(SETTINGS[3])}
+    <div class="legend">
+      <i style="--c:#f5a524">Hides</i>
+      <i style="--c:#4ade80">Restores</i>
+      <i style="--c:#a78bfa">Redirects</i>
+    </div>`
+
+  el.querySelectorAll('.tab').forEach(($t) => {
+    $t.addEventListener('click', () => {
+      let i = Number($t.dataset.i)
+      el.dataset.tab = String(i)
+      el.querySelectorAll('.tab').forEach(($o) =>
+        $o.setAttribute('aria-selected', String($o === $t)))
+      el.querySelector('.eyebrow').textContent = `${TABS[i][0]} — ${TABS[i][1]}`
+    })
+  })
+  return el
+}
+
+function row(s) {
+  return `<div class="opt">
+    <div class="top">
+      <span class="label">${s.label}</span>
+      <span class="sw ${s.on ? 'on' : ''}" data-kind="${s.kind}"></span>
+    </div>
+    <p class="desc">${s.desc}</p>
+  </div>`
+}
+
+function mount(target, items) {
+  let $row = document.getElementById(target)
+  for (let it of items) {
+    let $v = document.createElement('div')
+    $v.className = 'variant'
+    $v.innerHTML = `<div class="cap">
+      <span class="name">${it.name}</span>
+      <span class="hex">${it.hex}</span>
+      ${it.rec ? '<span class="rec">Recommended</span>' : ''}
+    </div>`
+    $v.append(panel(it))
+    if (it.hint) {
+      let $h = document.createElement('p')
+      $h.className = 'hint'
+      $h.textContent = it.hint
+      $v.append($h)
+    }
+    $row.append($v)
+  }
+}
+
+mount('rowBrightness', [
+  {name: 'Current', hex: '#000000', foundation: 'f-current', colour: 'c-single',
+   hint: 'Pure black, no light mode, no elevation. Base and raised are the same colour, so nothing sits above anything else.'},
+  {name: 'Light', hex: '#f6f6f7', foundation: 'f-light', colour: 'c-single', rec: true,
+   hint: 'White cards on a grey page. Colour does the elevation work, with a soft shadow rather than a hairline outline.'},
+  {name: 'Dim', hex: '#15202b', foundation: 'f-dim', colour: 'c-single',
+   hint: 'X’s own mid theme — the same family as the Dim option your extension already offers for the site. Dark without the void.'},
+  {name: 'Lights out', hex: '#0a0a0b', foundation: 'f-neutral', colour: 'c-single',
+   hint: 'Near-black rather than pure black, so surfaces can still stack. The dark you have now, fixed.'},
+])
+
+mount('rowFoundation', [
+  {name: 'Neutral', hex: '#0a0a0b', foundation: 'f-neutral', colour: 'c-single',
+   hint: 'True greys. Technical, terminal-adjacent.'},
+  {name: 'Cool slate', hex: '#0b0d11', foundation: 'f-slate', colour: 'c-single',
+   hint: 'A blue cast through every neutral. Reads more product, less terminal.'},
+  {name: 'Warm charcoal', hex: '#100f0e', foundation: 'f-warm', colour: 'c-single',
+   hint: 'A warm cast. Softer and less clinical.'},
+])
+
+mount('rowColour', [
+  // Opens on tab 02 so the hue difference is visible without clicking - on
+  // tab 01 this variant is identical to the single-accent one.
+  {name: 'Per-tab hue', hex: 'six hues, one at a time', foundation: 'f-neutral', colour: 'c-pertab', tab: 1, rec: true,
+   hint: 'Click the tabs — accent, eyebrow and toggles follow the section. Fixes "all one colour" without ever showing two hues at once.'},
+  {name: 'One accent', hex: '#4a9eff', foundation: 'f-neutral', colour: 'c-single',
+   hint: 'Blue means on, and nothing else. All other separation comes from depth and the four text levels. Most restrained.'},
+  {name: 'Semantic', hex: 'amber / green / violet', foundation: 'f-neutral', colour: 'c-semantic',
+   hint: 'Colour says what a setting does — hides, restores, redirects. Most information, busiest look.'},
+])
+</script>
+</body>
+</html>
