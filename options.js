@@ -476,7 +476,9 @@ let $showBlueReplyFollowersCountLabel = /** @type {HTMLElement} */ (document.que
 //#region Utility functions
 function exportConfig() {
   let $a = document.createElement('a')
-  $a.download = `birdfeed-v4.23.2.config.json`
+  // From the manifest rather than a literal: the release script bumps three
+  // manifests, so anything hand-written here silently keeps the old version.
+  $a.download = `birdfeed-v${chrome.runtime.getManifest().version}.config.json`
   $a.href = URL.createObjectURL(new Blob([
     JSON.stringify(optionsConfig, null, 2)
   ], {type: 'application/json'}))
@@ -498,6 +500,23 @@ function exportConfig() {
 //   debug    a diagnostic toggle; importing someone else's would fill the console
 const IMPORT_METADATA = new Set(['version', 'debug'])
 
+// Settings that existed once and no longer do. Kept as an explicit list rather
+// than inferred from defaultConfig: "not a default" is also true of a key from
+// a future version or a typo, and those should stay unrecognised.
+//
+// Two jobs, which is why it is one list. Storage is pruned on load so the keys
+// stop riding along in exports, and the importer reports them honestly - an
+// export taken before the upgrade still carries them, and no amount of pruning
+// reaches a file already on disk.
+//   4.24.0  the Redirects & layout group
+const RETIRED_CONFIG_KEYS = [
+  'redirectToTwitter',
+  'redirectChatNav',
+  'redirectTwitterLinks',
+  'tweakNewLayout',
+  'hideToggleNavigation',
+]
+
 const IMPORT_SHAPES = {
   customCss: (v) => typeof v == 'string',
   mutedQuotes: (v) => Array.isArray(v),
@@ -506,16 +525,21 @@ const IMPORT_SHAPES = {
 
 /**
  * @param {Record<string, any>} incoming
- * @returns {{changes: Record<string, any>, applied: string[], unchanged: string[], skipped: string[]}}
+ * @returns {{changes: Record<string, any>, applied: string[], unchanged: string[], skipped: string[], retired: string[]}}
  */
 function validateImport(incoming) {
   let changes = {}
   let applied = []
   let unchanged = []
   let skipped = []
+  let retired = []
 
   for (let [key, value] of Object.entries(incoming)) {
     if (IMPORT_METADATA.has(key)) continue
+    if (RETIRED_CONFIG_KEYS.includes(key)) {
+      retired.push(key)
+      continue
+    }
 
     let ok = false
     let $control = $form.elements[key]
@@ -556,7 +580,15 @@ function validateImport(incoming) {
     }
   }
 
-  return {changes, applied, unchanged, skipped}
+  return {changes, applied, unchanged, skipped, retired}
+}
+
+/**
+ * @param {number} n
+ * @param {string} noun
+ */
+function plural(n, noun) {
+  return `${n} ${noun}${n == 1 ? '' : 's'}`
 }
 
 /** @param {File} file */
@@ -582,14 +614,17 @@ function importConfig(file) {
       return
     }
 
-    let {changes, applied, unchanged, skipped} = validateImport(incoming)
+    let {changes, applied, unchanged, skipped, retired} = validateImport(incoming)
     if (!applied.length) {
-      // "Nothing applied" and "nothing recognised" are different outcomes: a
-      // file that matches your settings exactly is a success, not a failure.
-      show(unchanged.length
-        ? `Nothing to change - those ${unchanged.length} settings already match yours.`
-        : `Nothing imported - none of the ${skipped.length} entries were recognised.`,
-        unchanged.length > 0)
+      // "Nothing applied", "nothing recognised" and "nothing left that exists"
+      // are three different outcomes. Only the middle one is a failure: a file
+      // matching your settings exactly succeeded, and so did one whose settings
+      // this version simply no longer has.
+      let text =
+        unchanged.length ? `Nothing to change - those ${unchanged.length} settings already match yours.` :
+        retired.length && !skipped.length ? `Nothing to import - ${plural(retired.length, 'setting')} in that file ${retired.length == 1 ? 'was' : 'were'} removed from Birdfeed.` :
+        `Nothing imported - none of the ${skipped.length} ${skipped.length == 1 ? 'entry was' : 'entries were'} recognised.`
+      show(text, unchanged.length > 0 || (retired.length > 0 && !skipped.length))
       return
     }
 
@@ -598,9 +633,12 @@ function importConfig(file) {
     updateFormControls()
     updateCheckboxGroups()
     updateDisplay()
+    let notes = []
+    if (retired.length) notes.push(`${retired.length} no longer in Birdfeed`)
+    if (skipped.length) notes.push(`${skipped.length} unrecognised`)
     show(
-      `Imported ${applied.length} setting${applied.length == 1 ? '' : 's'}` +
-      (skipped.length ? `, skipped ${skipped.length} unrecognised.` : '.'),
+      `Imported ${plural(applied.length, 'setting')}` +
+      (notes.length ? ` - skipped ${notes.join(' and ')}.` : '.'),
       true
     )
   }, () => show(`Could not read that file.`, false))
@@ -1007,6 +1045,16 @@ function main() {
     if (storedConfig.twitterBlueChecks == 'dim') {
       storedConfig.twitterBlueChecks = 'replace'
     }
+
+    // Drop settings that no longer exist. Nothing reads them, but they are
+    // spread into optionsConfig below and so ride along into every export,
+    // where the next import has to explain them away.
+    let stale = RETIRED_CONFIG_KEYS.filter(key => key in storedConfig)
+    if (stale.length) {
+      for (let key of stale) delete storedConfig[key]
+      chrome.storage.local.remove(stale)
+    }
+
     optionsConfig = {...defaultConfig, ...storedConfig}
 
     $body.classList.toggle('debug', optionsConfig.debug === true)

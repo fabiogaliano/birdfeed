@@ -4,7 +4,6 @@ const {execSync, execFileSync} = require('child_process')
 const semver = require('semver')
 
 const manifestPaths = ['./manifest.mv2.json', './manifest.mv3.json', './safari/Shared (Extension)/Resources/manifest.json']
-const optionsJsPath = './options.js'
 const safariProjectPath = './safari/Birdfeed.xcodeproj/project.pbxproj'
 
 let releaseType = process.argv[2]
@@ -30,13 +29,6 @@ for (let manifestPath of manifestPaths) {
 }
 
 fs.writeFileSync(
-  optionsJsPath,
-  fs.readFileSync(optionsJsPath, {encoding: 'utf8'})
-    .replace(/birdfeed-.+\.config\.txt/, `birdfeed-v${nextVersion}.config.txt`),
-  {encoding: 'utf8'}
-)
-
-fs.writeFileSync(
   safariProjectPath,
   fs.readFileSync(safariProjectPath, {encoding: 'utf8'})
     .replace(/CURRENT_PROJECT_VERSION = (\d+)/g, (_, current) => `CURRENT_PROJECT_VERSION = ${Number(current) + 1}`)
@@ -51,7 +43,6 @@ console.log(`Bumped to v${nextVersion}`)
 execFileSync('git', [
   'add',
   ...manifestPaths,
-  optionsJsPath,
   safariProjectPath,
 ], {stdio: 'inherit'})
 execSync(`git commit -m "Release v${nextVersion}"`, {stdio: 'inherit'})
