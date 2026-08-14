@@ -71,9 +71,6 @@
   "experimentsOptionsLabel": {
     "message": "Fonctionnalités expérimentales"
   },
-  "exportConfigLabel": {
-    "message": "Exporter la configuration pour un rapport de bug"
-  },
   "extensionDescription": {
     "message": "Birdfeed vous donne le contrôle sur votre expérience Twitter/X. Personnalisez ce que vous voyez et profitez d'un fil propre et calme sans le bruit."
   },

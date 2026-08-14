@@ -71,9 +71,6 @@
   "experimentsOptionsLabel": {
     "message": "试验"
   },
-  "exportConfigLabel": {
-    "message": "导出配置用于错误报告"
-  },
   "extensionDescription": {
     "message": "Birdfeed让你完全掌控Twitter/X体验。自定义你想看的内容，享受干净、安静的信息流，远离噪音。"
   },

@@ -119,7 +119,8 @@ body.tab-behavior    form > [data-tab]:not([data-tab="behavior"]),
 body.tab-xfixes      form > [data-tab]:not([data-tab="xfixes"]),
 body.tab-appearance  form > [data-tab]:not([data-tab="appearance"]),
 body.tab-navigation  form > [data-tab]:not([data-tab="navigation"]),
-body.tab-advanced    form > [data-tab]:not([data-tab="advanced"]) {
+body.tab-advanced    form > [data-tab]:not([data-tab="advanced"]),
+body.tab-backup      form > [data-tab]:not([data-tab="backup"]) {
   display: none;
 }
 body.tab-timeline   .tab-intro:not([data-for-tab="timeline"]),
@@ -127,7 +128,8 @@ body.tab-behavior   .tab-intro:not([data-for-tab="behavior"]),
 body.tab-xfixes     .tab-intro:not([data-for-tab="xfixes"]),
 body.tab-appearance .tab-intro:not([data-for-tab="appearance"]),
 body.tab-navigation .tab-intro:not([data-for-tab="navigation"]),
-body.tab-advanced   .tab-intro:not([data-for-tab="advanced"]) {
+body.tab-advanced   .tab-intro:not([data-for-tab="advanced"]),
+body.tab-backup     .tab-intro:not([data-for-tab="backup"]) {
   display: none;
 }
 
@@ -192,6 +194,29 @@ body.searching .tab-intro {
 }
 body.no-descriptions p.option-info {
   display: none;
+}
+
+/* Import result. Stays visible after the file dialog closes, because that is
+   the only feedback that an import did anything - the form updates in place. */
+.import-status {
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--accent);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.import-status.is-error {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+/* Kept out of the descriptions toggle: hiding a result the user just triggered
+   would read as the import having failed silently. */
+body.no-descriptions .import-status {
+  display: block;
 }
 .brand-icon {
   height: 18px;

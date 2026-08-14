@@ -71,9 +71,6 @@
   "experimentsOptionsLabel": {
     "message": "실험"
   },
-  "exportConfigLabel": {
-    "message": "버그 보고서를 위한 설정 내보내기"
-  },
   "extensionDescription": {
     "message": "Birdfeed는 Twitter/X 경험을 완전히 제어할 수 있게 해줍니다. 보고 싶은 것을 맞춤 설정하고 노이즈 없는 깨끗하고 조용한 피드를 즐기세요."
   },

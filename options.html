@@ -67,6 +67,9 @@
         <button type="button" class="tab" data-tab="advanced" role="tab" aria-selected="false">
           <span class="tab-num">06</span><span class="tab-label">Advanced</span>
         </button>
+        <button type="button" class="tab" data-tab="backup" role="tab" aria-selected="false">
+          <span class="tab-num">07</span><span class="tab-label">Backup</span>
+        </button>
         <span class="tab-indicator" aria-hidden="true"></span>
       </nav>
       <button type="button" class="tab-scroll tab-scroll-right" aria-label="Scroll tabs right" tabindex="-1">
@@ -97,6 +100,10 @@
     <div class="tab-intro" data-for-tab="advanced" hidden>
       <span class="tab-intro-eyebrow">06 — Advanced</span>
       <p class="tab-intro-body">Custom CSS. Experiments. Diagnostics.</p>
+    </div>
+    <div class="tab-intro" data-for-tab="backup" hidden>
+      <span class="tab-intro-eyebrow">07 — Backup</span>
+      <p class="tab-intro-body">Save your settings to a file, or restore them on another browser.</p>
     </div>
 
     <section class="group labelled" data-tab="timeline">
@@ -1045,11 +1052,30 @@
           </label>
         </section>
       </section>
+    </section>
+
+    <section class="group labelled" data-tab="backup">
+      <label id="backupOptionsLabel">Settings file</label>
       <section>
         <label class="button">
-          <span id="exportConfigLabel">Export configuration for bug report</span>
+          <span id="exportConfigLabel">Export your settings to a file</span>
           <input type="button" value="Export" id="export-config">
         </label>
+        <p id="exportConfigInfo" class="option-info">
+          Saves every setting as a JSON file you can keep as a backup or move to another browser.
+        </p>
+      </section>
+      <section>
+        <label class="button">
+          <span id="importConfigLabel">Import settings from a file</span>
+          <input type="button" value="Import" id="import-config">
+          <input type="file" id="import-file" accept="application/json,.json,.txt" hidden>
+        </label>
+        <p id="importConfigInfo" class="option-info">
+          Replaces your current settings with the ones in the file. Unrecognised or
+          invalid entries are skipped rather than applied.
+        </p>
+        <p id="importStatus" class="import-status" hidden></p>
       </section>
     </section>
   </form>

@@ -58,6 +58,10 @@ for (let translationId of [
   'enabled',
   'experimentsOptionsLabel',
   'exportConfigLabel',
+  'exportConfigInfo',
+  'importConfigLabel',
+  'importConfigInfo',
+  'backupOptionsLabel',
   'fastBlockLabel',
   'followButtonStyleLabel',
   'followButtonStyleOption_monochrome',
@@ -469,6 +473,8 @@ let checkboxGroups
 // Page elements
 let $experiments = /** @type {HTMLDetailsElement} */ (document.querySelector('details#experiments'))
 let $exportConfig = document.querySelector('#export-config')
+let $importConfig = document.querySelector('#import-config')
+let $importFile = /** @type {HTMLInputElement|null} */ (document.querySelector('#import-file'))
 let $form = document.querySelector('form')
 let $hideQuotesFrom =  /** @type {HTMLDivElement} */ (document.querySelector('#hideQuotesFrom'))
 let $hideQuotesFromDetails = /** @type {HTMLDetailsElement} */ (document.querySelector('details#hideQuotesFromDetails'))
@@ -483,12 +489,134 @@ let $showBlueReplyFollowersCountLabel = /** @type {HTMLElement} */ (document.que
 //#region Utility functions
 function exportConfig() {
   let $a = document.createElement('a')
-  $a.download = `birdfeed-v4.23.2.config.txt`
+  $a.download = `birdfeed-v4.23.2.config.json`
   $a.href = URL.createObjectURL(new Blob([
     JSON.stringify(optionsConfig, null, 2)
-  ], {type: 'text/plain'}))
+  ], {type: 'application/json'}))
   $a.click()
   URL.revokeObjectURL($a.href)
+}
+
+// Import validates against the form itself rather than a hand-kept schema: the
+// controls already encode which keys exist and what each one accepts, so a
+// select can only receive one of its own options and a checkbox only a boolean.
+// A file from an older or newer version therefore imports what still applies
+// instead of failing whole, and cannot write a value the UI could not produce.
+//
+// Keys with no control (customCss, the quote lists) are checked by shape.
+// Present in an export but not settings, so they are passed over silently
+// rather than counted as unrecognised - otherwise importing your own export
+// reports a skipped entry and reads like something went wrong.
+//   version  file metadata
+//   debug    a diagnostic toggle; importing someone else's would fill the console
+const IMPORT_METADATA = new Set(['version', 'debug'])
+
+const IMPORT_SHAPES = {
+  customCss: (v) => typeof v == 'string',
+  mutedQuotes: (v) => Array.isArray(v),
+  hideQuotesFrom: (v) => Array.isArray(v),
+}
+
+/**
+ * @param {Record<string, any>} incoming
+ * @returns {{changes: Record<string, any>, applied: string[], unchanged: string[], skipped: string[]}}
+ */
+function validateImport(incoming) {
+  let changes = {}
+  let applied = []
+  let unchanged = []
+  let skipped = []
+
+  for (let [key, value] of Object.entries(incoming)) {
+    if (IMPORT_METADATA.has(key)) continue
+
+    let ok = false
+    let $control = $form.elements[key]
+
+    // The six .desktop/.mobile nav pairs share one name, so elements[name]
+    // hands back a RadioNodeList rather than a control. They stay in sync, so
+    // either one describes the value - but without this every one of them
+    // failed the instanceof checks and was silently dropped from every import.
+    if (typeof RadioNodeList != 'undefined' && $control instanceof RadioNodeList) {
+      $control = $control[0]
+    }
+
+    if (IMPORT_SHAPES[key]) {
+      ok = IMPORT_SHAPES[key](value)
+    } else if (!$control) {
+      ok = false
+    } else if ($control instanceof HTMLSelectElement) {
+      ok = [...$control.options].some(o => o.value == value)
+    } else if ($control instanceof HTMLInputElement && $control.type == 'checkbox') {
+      ok = typeof value == 'boolean'
+    } else if ($control instanceof HTMLInputElement && $control.type == 'number') {
+      ok = typeof value == 'number' && Number.isFinite(value)
+    } else if ($control instanceof HTMLInputElement) {
+      ok = typeof value == 'string'
+    }
+
+    if (!ok) {
+      skipped.push(key)
+      continue
+    }
+    // Only genuine differences are written, so an import is the same kind of
+    // storage write as flipping a toggle by hand.
+    if (JSON.stringify(optionsConfig[key]) != JSON.stringify(value)) {
+      changes[key] = value
+      applied.push(key)
+    } else {
+      unchanged.push(key)
+    }
+  }
+
+  return {changes, applied, unchanged, skipped}
+}
+
+/** @param {File} file */
+function importConfig(file) {
+  let $status = document.getElementById('importStatus')
+  let show = (text, ok) => {
+    if (!$status) return
+    $status.textContent = text
+    $status.classList.toggle('is-error', !ok)
+    $status.hidden = false
+  }
+
+  file.text().then(text => {
+    let incoming
+    try {
+      incoming = JSON.parse(text)
+    } catch {
+      show(`That file isn't valid JSON.`, false)
+      return
+    }
+    if (!incoming || typeof incoming != 'object' || Array.isArray(incoming)) {
+      show(`That file doesn't look like an exported settings file.`, false)
+      return
+    }
+
+    let {changes, applied, unchanged, skipped} = validateImport(incoming)
+    if (!applied.length) {
+      // "Nothing applied" and "nothing recognised" are different outcomes: a
+      // file that matches your settings exactly is a success, not a failure.
+      show(unchanged.length
+        ? `Nothing to change - those ${unchanged.length} settings already match yours.`
+        : `Nothing imported - none of the ${skipped.length} entries were recognised.`,
+        unchanged.length > 0)
+      return
+    }
+
+    Object.assign(optionsConfig, changes)
+    storeConfigChanges(changes)
+    updateFormControls()
+    updateCheckboxGroups()
+    updateDisplay()
+    show(
+      `Imported ${applied.length} setting${applied.length == 1 ? '' : 's'}` +
+      (skipped.length ? `, skipped ${skipped.length} unrecognised.` : '.'),
+      true
+    )
+  }, () => show(`Could not read that file.`, false))
 }
 
 function formatFollowerCount(num) {
@@ -731,6 +859,7 @@ const TAB_LABELS = {
   appearance: 'Appearance',
   navigation: 'Navigation',
   advanced: 'Advanced',
+  backup: 'Backup',
 }
 
 const DEFAULT_TAB = 'timeline'
@@ -897,6 +1026,16 @@ function main() {
     $body.classList.toggle('debug', optionsConfig.debug === true)
     $experiments.open = true
     $exportConfig.addEventListener('click', exportConfig)
+
+    // The real file input stays hidden so the pair reads as two matching
+    // buttons rather than one button and a browser-styled file picker.
+    $importConfig?.addEventListener('click', () => $importFile?.click())
+    $importFile?.addEventListener('change', () => {
+      let file = $importFile.files?.[0]
+      if (file) importConfig(file)
+      // Cleared so re-picking the same file fires change again.
+      $importFile.value = ''
+    })
     $form.addEventListener('change', onFormChanged)
     $hideQuotesFromDetails.addEventListener('toggle', updateHideQuotesFromDisplay)
     $mutedQuotesDetails.addEventListener('toggle', updateMutedQuotesDisplay)

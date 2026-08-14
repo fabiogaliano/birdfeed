@@ -71,9 +71,6 @@
   "experimentsOptionsLabel": {
     "message": "実験的機能"
   },
-  "exportConfigLabel": {
-    "message": "バグレポートの設定をエクスポート"
-  },
   "extensionDescription": {
     "message": "BirdfeedはあなたのTwitter/X体験を完全にコントロールできます。表示内容をカスタマイズして、ノイズのないクリーンで静かなフィードをお楽しみください。"
   },
