@@ -137,6 +137,7 @@ for (let translationId of [
   'restoreLinkHeadlinesLabel',
   'restoreOtherInteractionLinksLabel',
   'restoreQuoteTweetsLinkLabel',
+  'restorePhotoGridLabel',
   'restoreTweetSourceLabel',
   'retweetsLabel',
   'showBlueReplyFollowersCountAmountLabel',
@@ -161,6 +162,11 @@ for (let translationId of [
   'unwrapTcoLinksLabel',
   'unwrapTcoLinksInfo',
   'xFixesLabel',
+  'twitterBrandingOptionsLabel',
+  'postsAndLinksOptionsLabel',
+  'repliesOptionsLabel',
+  'premiumOptionsLabel',
+  'xAdditionsOptionsLabel',
 ]) {
   let $el = document.getElementById(translationId)
   if ($el) {
@@ -185,6 +191,127 @@ for (let translationClass of [
     $el.textContent = translation
   }
 }
+
+// Per-setting descriptions, following the same `<name>Info` convention as the
+// hand-written ones already in options.html. Injected rather than written into
+// the markup because they attach by control name: adding a description is then
+// one messages.json entry instead of an edit in three files, and a setting with
+// no description simply gets none.
+//
+// Controls that appear twice (the .desktop/.mobile pairs sharing a name) are
+// handled per label rather than by id - duplicate ids would be invalid, so the
+// injected paragraphs carry a class instead.
+for (let $control of document.querySelectorAll('input[name], select[name]')) {
+  let $label = $control.closest('label')
+  if (!$label) continue
+
+  // The eight hand-written ones predate this and carry no class. Tag them so
+  // the descriptions toggle hides every description, not just the injected ones.
+  let $existing = $label.nextElementSibling
+  if ($existing?.tagName == 'P') {
+    $existing.classList.add('option-info')
+    continue
+  }
+
+  let description = chrome.i18n.getMessage(`${$control.getAttribute('name')}Info`)
+  if (!description) continue
+
+  let $description = document.createElement('p')
+  $description.className = 'option-info'
+  $description.textContent = description
+  $label.after($description)
+}
+
+// Descriptions on/off. Kept in localStorage rather than the extension config:
+// this is a preference about the options page itself, and anything in the
+// config is written into the page's settings channel, where a multi-key write
+// has its own failure modes.
+{
+  let $toggle = document.getElementById('descriptionsToggle')
+  let show = localStorage.getItem('cpftDescriptions') != 'off'
+
+  let apply = () => {
+    // document.body rather than $body: that const is declared further down and
+    // would still be in its temporal dead zone here.
+    document.body.classList.toggle('no-descriptions', !show)
+    $toggle?.setAttribute('aria-pressed', String(show))
+  }
+  apply()
+
+  $toggle?.addEventListener('click', () => {
+    show = !show
+    localStorage.setItem('cpftDescriptions', show ? 'on' : 'off')
+    apply()
+  })
+}
+
+// Before/after examples, for the settings the audit managed to photograph.
+//
+// The images are built from audit runs by scripts/build-examples.js; a setting
+// only gets a marker if a pair exists for it, so coverage can grow without any
+// change here. Loaded rather than bundled into the page because index.json is
+// regenerated whenever the audit is re-run.
+//
+// Off because examples/ is not packaged yet: the audit crops to the densest
+// cluster of changed elements, which inverts for page-wide settings - when
+// everything changes, the densest cluster is the whole viewport - so most pairs
+// do not show the change they illustrate. Turn back on with the rebuilt images;
+// a fetch for a missing index.json logs a console error on every page load,
+// which is why this is a flag rather than a silent failure.
+const EXAMPLES_ENABLED = false
+
+if (EXAMPLES_ENABLED) fetch(chrome.runtime.getURL('examples/index.json'))
+  .then(response => response.ok ? response.json() : {})
+  .catch(() => ({}))
+  .then(examples => {
+    for (let $control of document.querySelectorAll('input[name], select[name]')) {
+      let name = $control.getAttribute('name')
+      if (!examples[name]) continue
+
+      let $label = $control.closest('label')
+      let $text = $label?.querySelector('span:not(.toggle)')
+      if (!$text || $text.querySelector('.option-example')) continue
+
+      let $marker = document.createElement('span')
+      $marker.className = 'option-example'
+      $marker.tabIndex = 0
+      $marker.setAttribute('role', 'img')
+      $marker.setAttribute('aria-label', chrome.i18n.getMessage('exampleAriaLabel') || 'Show example')
+      $marker.textContent = 'i'
+
+      // Built on first reveal: eagerly creating ~50 of these would decode every
+      // screenshot at load for panels that are mostly never opened.
+      let build = () => {
+        if ($marker.querySelector('.option-example-panel')) return
+        let $panel = document.createElement('span')
+        $panel.className = 'option-example-panel'
+        for (let [state, suffix] of [['OFF', 'before'], ['ON', 'after']]) {
+          let $side = document.createElement('span')
+          $side.className = 'option-example-side'
+          let $caption = document.createElement('span')
+          $caption.textContent = state
+          let $img = document.createElement('img')
+          $img.loading = 'lazy'
+          $img.alt = `${name} ${state}`
+          $img.src = chrome.runtime.getURL(`examples/${name}.${suffix}.jpg`)
+          $side.append($caption, $img)
+          $panel.append($side)
+        }
+        $marker.append($panel)
+      }
+      $marker.addEventListener('pointerenter', build)
+      $marker.addEventListener('focus', build)
+      // The marker lives inside the <label>, so without this a click on it -
+      // or on the panel it opens - toggles the very setting being explained.
+      $marker.addEventListener('click', (event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        build()
+      })
+
+      $text.append(' ', $marker)
+    }
+  })
 
 for (let amount of [1_000, 10_000, 100_000, 1_000_000]) {
   document.querySelector(`option[value="${amount}"]`).textContent = formatFollowerCount(amount)
@@ -281,6 +408,7 @@ const defaultConfig = {
   restoreLinkHeadlines: true,
   restoreOtherInteractionLinks: true,
   restoreQuoteTweetsLink: true,
+  restorePhotoGrid: true,
   restoreTweetSource: true,
   retweets: 'separate',
   showBlueReplyFollowersCount: false,

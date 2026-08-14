@@ -1,15 +1,27 @@
 {
+  "addAddMutedWordMenuItemInfo": {
+    "message": "Adds an \"Add muted word\" shortcut to the More menu, so muting a word takes one step instead of a trip through Settings."
+  },
   "addAddMutedWordMenuItemLabel_desktop": {
     "message": "Add \"Add muted word\" to the \"More\" menu"
   },
   "addAddMutedWordMenuItemLabel_mobile": {
     "message": "Add \"Add muted word\" to the slide-out menu"
   },
+  "addFocusedTweetAccountLocationInfo": {
+    "message": "Adds the account's country under a post you have opened."
+  },
   "addFocusedTweetAccountLocationLabel": {
     "message": "Show account location in focused tweets"
   },
+  "addUserHoverCardAccountLocationInfo": {
+    "message": "Adds the account's country to the card that appears when you hover a name."
+  },
   "addUserHoverCardAccountLocationLabel": {
     "message": "Show account location in user hover cards"
+  },
+  "alwaysUseLatestTweetsInfo": {
+    "message": "Opens Following instead of For you every time, so the timeline stays in time order."
   },
   "alwaysUseLatestTweetsLabel": {
     "message": "Use the Following (chronological) timeline by default"
@@ -18,11 +30,17 @@
     "message": "Take control of your timeline",
     "description": "<= 30 characters"
   },
+  "bypassAgeVerificationInfo": {
+    "message": "Skips the age check prompt. Changes no visible markup."
+  },
   "bypassAgeVerificationLabel": {
     "message": "Bypass age verification"
   },
   "customCssLabel": {
     "message": "Custom CSS"
+  },
+  "darkModeThemeInfo": {
+    "message": "Which dark theme to use: dim or lights out."
   },
   "darkModeThemeLabel": {
     "message": "Dark mode theme"
@@ -33,11 +51,17 @@
   "debugLabel": {
     "message": "Debug mode"
   },
+  "debugLogTimelineStatsInfo": {
+    "message": "Logs a per-timeline breakdown of what was hidden to the console."
+  },
   "debugLogTimelineStatsLabel": {
     "message": "Log timeline stats"
   },
   "debugOptionsLabel": {
     "message": "Debug options"
+  },
+  "defaultToLatestSearchInfo": {
+    "message": "Opens search results on \"Latest\" instead of \"Top\", so results are in time order."
   },
   "defaultToLatestSearchLabel": {
     "message": "Default to \"Latest\" tab in Search"
@@ -48,26 +72,41 @@
   "disableHomeTimelineLabel": {
     "message": "Disable the home timeline"
   },
+  "disableTweetTextFormattingInfo": {
+    "message": "Renders bold and italic markup in posts as plain text."
+  },
   "disableTweetTextFormattingLabel": {
     "message": "Disable bold and italic text in tweets"
+  },
+  "disabledHomeTimelineRedirectInfo": {
+    "message": "Which page opens instead of the home timeline."
   },
   "disabledHomeTimelineRedirectLabel": {
     "message": "Redirect home timeline to"
   },
-  "disabledHomeTimelineRedirectOption_messages": {
-    "message": "Messages"
-  },
   "disabledHomeTimelineRedirectOption_bookmarks": {
     "message": "Bookmarks"
   },
+  "disabledHomeTimelineRedirectOption_messages": {
+    "message": "Messages"
+  },
+  "dontUseChirpFontInfo": {
+    "message": "Uses the system font instead of X's Chirp typeface."
+  },
   "dontUseChirpFontLabel": {
     "message": "Don't use the Chirp font"
+  },
+  "dropdownMenuFontWeightInfo": {
+    "message": "Uses normal weight instead of bold for menu items."
   },
   "dropdownMenuFontWeightLabel": {
     "message": "Use normal font weight in dropdown menus"
   },
   "enabled": {
     "message": "Enabled"
+  },
+  "exampleAriaLabel": {
+    "message": "Show a before and after example"
   },
   "experimentsOptionsLabel": {
     "message": "Experiments"
@@ -89,11 +128,17 @@
   "extensionNameDisabled": {
     "message": "Birdfeed (disabled)"
   },
+  "fastBlockInfo": {
+    "message": "Blocks immediately when you pick Block, with no confirmation dialog. There is no undo step."
+  },
   "fastBlockLabel": {
     "message": "Fast blocking (skips confirm dialog)"
   },
   "features": {
     "message": "Features"
+  },
+  "followButtonStyleInfo": {
+    "message": "Whether Follow buttons use one flat colour or pick up the current theme colour."
   },
   "followButtonStyleLabel": {
     "message": "Button style"
@@ -110,41 +155,80 @@
   "fullWidthContentLabel": {
     "message": "Full-width timeline content"
   },
+  "fullWidthMediaInfo": {
+    "message": "Lets images and link cards use the full timeline width too, instead of keeping their original size."
+  },
   "fullWidthMediaLabel": {
     "message": "Full-width media & cards"
+  },
+  "hideAccountSwitcherInfo": {
+    "message": "Removes the account name and avatar at the bottom of the left navigation."
   },
   "hideAccountSwitcherLabel": {
     "message": "Account switcher"
   },
+  "hideAdsNavInfo": {
+    "message": "Removes Ads from the navigation. Only appears on accounts that have it."
+  },
   "hideAdsNavLabel": {
     "message": "Ads"
+  },
+  "hideAllMetricsInfo": {
+    "message": "Hides every count at once, overriding the individual toggles below."
   },
   "hideAllMetricsLabel": {
     "message": "Hide all"
   },
+  "hideBookmarkButtonInfo": {
+    "message": "Removes the bookmark icon from the row under posts."
+  },
   "hideBookmarkButtonLabel": {
     "message": "Bookmark button under tweets"
+  },
+  "hideBookmarkMetricsInfo": {
+    "message": "Hides the bookmark count next to the bookmark icon."
   },
   "hideBookmarkMetricsLabel": {
     "message": "Bookmarks"
   },
+  "hideBookmarksNavInfo": {
+    "message": "Removes Bookmarks from the navigation."
+  },
   "hideBookmarksNavLabel": {
     "message": "Bookmarks"
+  },
+  "hideBusinessNavInfo": {
+    "message": "Removes Business from the navigation. Only appears on accounts that have it."
   },
   "hideBusinessNavLabel": {
     "message": "Business"
   },
+  "hideChatNavInfo": {
+    "message": "Removes Chat from the navigation."
+  },
   "hideChatNavLabel": {
     "message": "Chat"
+  },
+  "hideCommunitiesNavInfo": {
+    "message": "Removes Communities from the navigation."
   },
   "hideCommunitiesNavLabel": {
     "message": "Communities"
   },
+  "hideComposeTweetInfo": {
+    "message": "Removes the floating \"Post\" button. You can still post from the box at the top of the timeline."
+  },
   "hideComposeTweetLabel": {
     "message": "Hide the Compose Tweet button"
   },
+  "hideConnectNavInfo": {
+    "message": "Removes the Follow / Connect item from the navigation."
+  },
   "hideConnectNavLabel": {
     "message": "Follow"
+  },
+  "hideCreatorStudioNavInfo": {
+    "message": "Removes Creator Studio from the navigation. Only appears on accounts that have it."
   },
   "hideCreatorStudioNavLabel": {
     "message": "Creator Studio"
@@ -152,20 +236,38 @@
   "hideDiscoverSuggestionsLabel": {
     "message": "Hide \"Discover\" suggestions"
   },
+  "hideEditImageInfo": {
+    "message": "Removes the Grok \"Edit image\" links that X adds to photos in posts and to profile settings."
+  },
   "hideEditImageLabel": {
     "message": "Hide Edit image"
+  },
+  "hideExploreNavInfo": {
+    "message": "Removes Explore from the navigation."
   },
   "hideExploreNavLabel": {
     "message": "Explore"
   },
+  "hideExploreNavWithSidebarInfo": {
+    "message": "Brings Explore back when the sidebar is hidden, since search lives there otherwise."
+  },
   "hideExploreNavWithSidebarLabel": {
     "message": "Show when sidebar is hidden"
+  },
+  "hideExplorePageContentsInfo": {
+    "message": "Strips Explore down to just the search box - no trending, no suggested posts."
   },
   "hideExplorePageContentsLabel": {
     "message": "Hide Explore page contents and use it only for searching"
   },
+  "hideFollowingMetricsInfo": {
+    "message": "Hides the following and follower counts on profiles."
+  },
   "hideFollowingMetricsLabel": {
     "message": "Following / followers"
+  },
+  "hideForYouTimelineInfo": {
+    "message": "Removes the \"For you\" tab entirely, leaving only Following."
   },
   "hideForYouTimelineLabel": {
     "message": "Hide the \"For you\" (algorithmic) timeline"
@@ -174,34 +276,67 @@
     "message": "Hide Grok"
   },
   "hideGrokLabel": {
-    "message": "Hide Grok"
+    "message": "Hide Grok in the sidebar"
+  },
+  "hideGrokNavInfo": {
+    "message": "Removes the Grok item from the left navigation."
+  },
+  "hideGrokTweetsInfo": {
+    "message": "Removes posts that share a Grok conversation link."
   },
   "hideGrokTweetsLabel": {
-    "message": "Hide Grok tweets"
+    "message": "Hide posts sharing a Grok conversation"
   },
   "hideInlinePrompts": {
     "message": "Hide inline prompts in the timeline"
   },
+  "hideInlinePromptsInfo": {
+    "message": "Removes the prompts X injects between posts - follow suggestions, \"complete your profile\" and similar."
+  },
   "hideJobsLabel": {
     "message": "Hide Jobs"
+  },
+  "hideJobsNavInfo": {
+    "message": "Removes the Jobs item from the left navigation. Only appears on accounts that have it."
+  },
+  "hideLikeMetricsInfo": {
+    "message": "Hides the like count next to the heart icon."
   },
   "hideLikeMetricsLabel": {
     "message": "Likes"
   },
+  "hideListsNavInfo": {
+    "message": "Removes Lists from the navigation."
+  },
   "hideListsNavLabel": {
     "message": "Lists"
+  },
+  "hideLiveBroadcastBarInfo": {
+    "message": "Removes the live video bar pinned above the timeline."
   },
   "hideLiveBroadcastBarLabel": {
     "message": "Hide Live broadcast bar"
   },
+  "hideLiveBroadcastsInfo": {
+    "message": "Removes the live video block from the sidebar."
+  },
   "hideLiveBroadcastsLabel": {
     "message": "Hide Live broadcasts"
+  },
+  "hideMessagesBottomNavItemInfo": {
+    "message": "Removes Messages from the navigation."
   },
   "hideMessagesBottomNavItemLabel": {
     "message": "Messages"
   },
+  "hideMessagesDrawerInfo": {
+    "message": "Removes the messages panel docked in the bottom right corner."
+  },
   "hideMessagesDrawerLabel": {
     "message": "Chat drawer"
+  },
+  "hideMetricsInfo": {
+    "message": "Hides engagement counts. The toggles below choose which ones."
   },
   "hideMetricsLabel": {
     "message": "Hide metrics"
@@ -212,11 +347,23 @@
   "hideMoreSlideOutMenuItemsOptionsLabel_mobile": {
     "message": "Hide slide-out menu items you don't use"
   },
+  "hideMoreTweetsInfo": {
+    "message": "Removes the \"Discover more\" block appended below a post's replies."
+  },
+  "hideNotificationLikesInfo": {
+    "message": "Keeps likes out of Notifications, so only replies, mentions and follows remain."
+  },
   "hideNotificationLikesLabel": {
     "message": "Hide Likes in Notifications"
   },
+  "hideNotificationRetweetsInfo": {
+    "message": "Keeps retweets out of Notifications."
+  },
   "hideNotificationRetweetsLabel": {
     "message": "Hide Retweets in Notifications"
+  },
+  "hideNotificationsInfo": {
+    "message": "What to do with the notification count: leave it, hide just the badge, or hide notifications entirely. Also applies to the browser tab icon."
   },
   "hideNotificationsLabel": {
     "message": "Hide notifications"
@@ -224,8 +371,14 @@
   "hideProfileHeaderMetricsLabel": {
     "message": "Profile header metrics"
   },
+  "hideProfileRetweetsInfo": {
+    "message": "Shows only a profile's own posts on its timeline, not what it retweeted."
+  },
   "hideProfileRetweetsLabel": {
     "message": "Hide Retweets in user profiles"
+  },
+  "hideQuoteTweetMetricsInfo": {
+    "message": "Hides the quote count next to the quote icon."
   },
   "hideQuoteTweetMetricsLabel": {
     "message": "Quote tweets"
@@ -239,50 +392,101 @@
       }
     }
   },
+  "hideReplyMetricsInfo": {
+    "message": "Hides the reply count next to the reply icon."
+  },
   "hideReplyMetricsLabel": {
     "message": "Replies"
+  },
+  "hideRetweetMetricsInfo": {
+    "message": "Hides the retweet count next to the retweet icon."
   },
   "hideRetweetMetricsLabel": {
     "message": "Retweets"
   },
+  "hideSeeNewTweetsInfo": {
+    "message": "Removes the \"Show N posts\" banner that appears at the top when new posts arrive."
+  },
   "hideSeeNewTweetsLabel": {
     "message": "Hide \"See new Tweets\""
+  },
+  "hideShareTweetButtonInfo": {
+    "message": "Removes the share icon from the row under posts."
   },
   "hideShareTweetButtonLabel": {
     "message": "Share button under tweets"
   },
+  "hideSidebarContentInfo": {
+    "message": "Hides the whole right-hand sidebar. The toggles below hide individual blocks instead."
+  },
   "hideSidebarContentLabel": {
     "message": "Hide sidebar contents"
+  },
+  "hideSortRepliesMenuInfo": {
+    "message": "Removes the \"Sort replies\" control from a post's page."
   },
   "hideSortRepliesMenuLabel": {
     "message": "Hide \"Sort replies\" menu"
   },
+  "hideSpacesNavInfo": {
+    "message": "Removes Spaces from the navigation."
+  },
   "hideSpacesNavLabel": {
-    "message": "Create your Space"
+    "message": "Spaces"
+  },
+  "hideSubscriptionsInfo": {
+    "message": "Removes everything to do with paid subscriptions: Subscribe buttons on profiles and posts, the Subscriptions tab and count, the Subscribe menu items, and the subscriber badge on replies."
   },
   "hideSubscriptionsLabel": {
     "message": "Hide Subscriptions"
   },
+  "hideSuggestedContentSearchInfo": {
+    "message": "Removes suggested posts and accounts injected into search results."
+  },
   "hideSuggestedContentSearchLabel": {
     "message": "Hide suggested content in Search"
+  },
+  "hideSuggestedFollowsInfo": {
+    "message": "Removes the \"Who to follow\" block from the sidebar."
   },
   "hideSuggestedFollowsLabel": {
     "message": "Hide suggested follows"
   },
+  "hideTimelineTweetBoxInfo": {
+    "message": "Removes the \"What is happening?\" box at the top of the home timeline."
+  },
   "hideTimelineTweetBoxLabel": {
     "message": "Tweet box in timeline"
+  },
+  "hideTodaysNewsInfo": {
+    "message": "Removes the news block from the sidebar."
   },
   "hideTodaysNewsLabel": {
     "message": "Hide Today's News"
   },
+  "hideToggleNavigationInfo": {
+    "message": "Removes the control that collapses the left navigation."
+  },
   "hideToggleNavigationLabel": {
     "message": "Hide Toggle navigation"
+  },
+  "hideTotalTweetsMetricsInfo": {
+    "message": "Hides the post count shown under a profile name in the header."
+  },
+  "hideTwitterBlueRepliesInfo": {
+    "message": "Removes replies from paid accounts you have no connection to. The toggles below add accounts back."
   },
   "hideTwitterBlueRepliesLabel": {
     "message": "Hide Premium blue check replies"
   },
+  "hideTwitterBlueUpsellsInfo": {
+    "message": "Removes prompts to subscribe to Premium."
+  },
   "hideTwitterBlueUpsellsLabel": {
     "message": "Hide Premium upsells"
+  },
+  "hideUnavailableQuoteTweetsInfo": {
+    "message": "Removes posts whose quoted post is from an account you blocked or muted, instead of showing an empty placeholder."
   },
   "hideUnavailableQuoteTweetsLabel": {
     "message": "Hide quotes and replies to blocked and muted accounts"
@@ -290,17 +494,32 @@
   "hideUnusedUiItemsOptionsLabel": {
     "message": "Hide UI items you don't use"
   },
+  "hideVerifiedNotificationsTabInfo": {
+    "message": "Removes the \"Verified\" tab from Notifications and the Followers page."
+  },
   "hideVerifiedNotificationsTabLabel": {
     "message": "Hide Verified Followers tab"
+  },
+  "hideViewActivityLinksInfo": {
+    "message": "Removes the \"View post engagements\" link under your own posts, and the matching menu item."
   },
   "hideViewActivityLinksLabel": {
     "message": "\"View activity\" links"
   },
+  "hideViewsInfo": {
+    "message": "Hides the view count shown under posts."
+  },
   "hideViewsLabel": {
     "message": "Hide Views under tweets"
   },
+  "hideWhatsHappeningInfo": {
+    "message": "Removes the trends block from the sidebar."
+  },
   "hideWhatsHappeningLabel": {
     "message": "Hide What's happening"
+  },
+  "hideWhoToFollowEtcInfo": {
+    "message": "Removes \"Who to follow\", \"Topics to follow\" and similar suggestion sections injected between posts, and the suggestion sidebar on profiles."
   },
   "hideWhoToFollowEtcLabel": {
     "message": "Hide suggested content in the timeline"
@@ -308,8 +527,14 @@
   "homeTimelineOptionsLabel": {
     "message": "Home timeline"
   },
+  "listRetweetsInfo": {
+    "message": "Whether retweets appear inside Lists. Controlled separately from the main timeline setting, from a toggle on the List itself."
+  },
   "listRetweetsLabel": {
     "message": "Retweets in Lists"
+  },
+  "mutableQuoteTweetsInfo": {
+    "message": "Adds a menu item for muting quote tweets of a specific account."
   },
   "mutableQuoteTweetsLabel": {
     "message": "Enable muting of Quote Tweets"
@@ -323,8 +548,14 @@
       }
     }
   },
+  "navBaseFontSizeInfo": {
+    "message": "Uses normal-sized text in the left navigation rather than X's larger size."
+  },
   "navBaseFontSizeLabel": {
     "message": "Use normal text font style in navigation bar"
+  },
+  "navDensityInfo": {
+    "message": "How much vertical space each left navigation item takes."
   },
   "navDensityLabel": {
     "message": "Navigation density"
@@ -377,26 +608,41 @@
     "message": "Show in separate tab",
     "description": "Option for showing Retweets or Quote Tweets in a separate tab from the main timeline"
   },
+  "postsAndLinksOptionsLabel": {
+    "message": "Posts & links"
+  },
+  "premiumOptionsLabel": {
+    "message": "Premium & blue checks"
+  },
   "preventNextVideoAutoplayInfo": {
     "message": "Videos will loop instead"
   },
   "preventNextVideoAutoplayLabel": {
     "message": "Prevent next video autoplaying"
   },
+  "quoteTweetsInfo": {
+    "message": "Where quote tweets appear: mixed into the timeline, moved to their own tab, or hidden."
+  },
   "quoteTweetsLabel": {
     "message": "Quote Tweets"
+  },
+  "redirectChatNavInfo": {
+    "message": "Makes the Chat nav item open the older Messages page instead."
   },
   "redirectChatNavLabel": {
     "message": "Redirect Chat nav item to Messages"
   },
+  "redirectToTwitterInfo": {
+    "message": "Sends x.com addresses back to twitter.com."
+  },
   "redirectToTwitterLabel": {
     "message": "Redirect to twitter.com"
   },
-  "redirectTwitterLinksLabel": {
-    "message": "Redirect Twitter/X links to"
-  },
   "redirectTwitterLinksInfo": {
     "message": "Rewrite twitter.com/x.com links to an alternative frontend when copying (leave empty to disable)"
+  },
+  "redirectTwitterLinksLabel": {
+    "message": "Redirect Twitter/X links to"
   },
   "reduceAlgorithmicContentOptionsLabel": {
     "message": "Remove algorithmic content"
@@ -408,22 +654,49 @@
     "message": "Hide the action bar under tweets – replies are now the only means of interacting"
   },
   "reducedInteractionModeLabel": {
-    "message": "Reduced interaction mode"
+    "message": "Hide all engagement buttons"
+  },
+  "replaceLogoInfo": {
+    "message": "Puts the Twitter bird back in place of the X logo, and restores the home and messages icons that came with it."
   },
   "replaceLogoLabel": {
     "message": "Replace X branding changes"
   },
+  "repliesOptionsLabel": {
+    "message": "Replies"
+  },
+  "restoreLinkHeadlinesInfo": {
+    "message": "Puts the article headline back under link previews, which X reduced to a bare domain."
+  },
   "restoreLinkHeadlinesLabel": {
     "message": "Restore headlines under external links"
+  },
+  "restoreOtherInteractionLinksInfo": {
+    "message": "Shows retweet and like counts as links under a post you have opened. Only on the post's own page."
   },
   "restoreOtherInteractionLinksLabel": {
     "message": "Restore other links under Tweets"
   },
+  "restorePhotoGridInfo": {
+    "message": "Shows a post's photos as a grid - 2 side by side, 4 as a square - instead of a swipeable carousel."
+  },
+  "restorePhotoGridLabel": {
+    "message": "Show multiple photos as a grid instead of a carousel"
+  },
+  "restoreQuoteTweetsLinkInfo": {
+    "message": "Shows the quote count as a link under a post you have opened. Only on the post's own page, and only if it has quotes."
+  },
   "restoreQuoteTweetsLinkLabel": {
     "message": "Restore Quote Tweets link under Tweets"
   },
+  "restoreTweetSourceInfo": {
+    "message": "Shows which app a post was sent from. Only appears on a post's own page, not in the timeline."
+  },
   "restoreTweetSourceLabel": {
     "message": "Restore Tweet source label"
+  },
+  "retweetsInfo": {
+    "message": "Where retweets appear: mixed into the timeline, moved to their own tab, or hidden."
   },
   "retweetsLabel": {
     "message": "Retweets"
@@ -434,8 +707,14 @@
   "sharedTweetsOptionsLabel": {
     "message": "Tweets shared by other users"
   },
+  "showBlueReplyFollowersCountAmountInfo": {
+    "message": "The follower count a paid account needs for its replies to be kept."
+  },
   "showBlueReplyFollowersCountAmountLabel": {
     "message": "Number of followers"
+  },
+  "showBlueReplyFollowersCountInfo": {
+    "message": "Keeps replies from paid accounts above the follower count set below."
   },
   "showBlueReplyFollowersCountLabel": {
     "message": "Show accounts with over $AMOUNT$ followers",
@@ -446,20 +725,38 @@
       }
     }
   },
+  "showBookmarkButtonUnderFocusedTweetsInfo": {
+    "message": "Keeps the bookmark icon on a post you have opened, even though it is hidden in the timeline."
+  },
   "showBookmarkButtonUnderFocusedTweetsLabel": {
     "message": "Show under focused tweets"
+  },
+  "showPremiumReplyBusinessInfo": {
+    "message": "Keeps replies from verified Business accounts (gold check)."
   },
   "showPremiumReplyBusinessLabel": {
     "message": "Show verified Business accounts"
   },
+  "showPremiumReplyFollowedByInfo": {
+    "message": "Keeps replies from paid accounts that follow you."
+  },
   "showPremiumReplyFollowedByLabel": {
     "message": "Show accounts which follow me"
+  },
+  "showPremiumReplyFollowingInfo": {
+    "message": "Keeps replies from paid accounts you follow."
   },
   "showPremiumReplyFollowingLabel": {
     "message": "Show accounts I follow"
   },
+  "showPremiumReplyGovernmentInfo": {
+    "message": "Keeps replies from verified Government accounts (grey check)."
+  },
   "showPremiumReplyGovernmentLabel": {
     "message": "Show verified Government accounts"
+  },
+  "showRelevantPeopleInfo": {
+    "message": "Keeps the \"Relevant people\" block when you open a post, even with the sidebar hidden."
   },
   "showRelevantPeopleLabel": {
     "message": "Show \"Relevant people\" when viewing a tweet"
@@ -467,8 +764,14 @@
   "sidebarLabel": {
     "message": "Sidebar"
   },
+  "sortFollowingInfo": {
+    "message": "Forces the Following timeline to sort by most recent or by popularity, by rewriting the request X makes."
+  },
   "sortFollowingLabel": {
     "message": "Sort Following"
+  },
+  "sortRepliesInfo": {
+    "message": "Which order replies open in."
   },
   "sortRepliesLabel": {
     "message": "Default sorting of replies"
@@ -479,8 +782,14 @@
   "tweakNewLayoutLabel": {
     "message": "Tweak new layout"
   },
+  "tweakQuoteTweetsPageInfo": {
+    "message": "On the Quote Tweets page, hides the original post repeated under every quote."
+  },
   "tweakQuoteTweetsPageLabel": {
     "message": "Hide the quoted tweet when viewing Quote Tweets"
+  },
+  "twitterBlueChecksInfo": {
+    "message": "What to do with paid blue checks: leave them, hide them, or replace them with a smaller badge."
   },
   "twitterBlueChecksLabel": {
     "message": "Premium blue checks"
@@ -488,29 +797,41 @@
   "twitterBlueChecksOption_replace": {
     "message": "Replace with Twitter Blue logo"
   },
+  "twitterBrandingOptionsLabel": {
+    "message": "Twitter branding"
+  },
   "uiImprovementsOptionsLabel": {
     "message": "UI improvements"
   },
   "uiTweaksOptionsLabel": {
     "message": "UI tweaks"
   },
+  "unblurSensitiveContentInfo": {
+    "message": "Shows media marked sensitive without the click-through blur."
+  },
   "unblurSensitiveContentLabel": {
     "message": "Unblur sensitive content"
   },
+  "uninvertFollowButtonsInfo": {
+    "message": "Swaps the Follow and Following button styles back, so Follow is the filled one."
+  },
   "uninvertFollowButtonsLabel": {
     "message": "Uninvert Follow / Following buttons"
-  },
-  "unwrapTcoLinksLabel": {
-    "message": "Unwrap t.co shortened links"
-  },
-  "unwrapTcoLinksInfo": {
-    "message": "Replace t.co links with the actual destination URL"
   },
   "unmuteButtonText": {
     "message": "Unmute",
     "description": "Button used in the options page to unmute a muted Quote Tweet"
   },
+  "unwrapTcoLinksInfo": {
+    "message": "Replace t.co links with the actual destination URL"
+  },
+  "unwrapTcoLinksLabel": {
+    "message": "Unwrap t.co shortened links"
+  },
+  "xAdditionsOptionsLabel": {
+    "message": "Grok & other X additions"
+  },
   "xFixesLabel": {
-    "message": "X fixes"
+    "message": "Redirects & layout"
   }
 }

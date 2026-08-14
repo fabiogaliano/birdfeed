@@ -1,24 +1,39 @@
 :root {
   color-scheme: dark;
 
-  --bg:            #000000;
-  --bg-raised:     #000000;
-  --bg-inset:      #141414;
-  --fg:            #fafafa;
-  --fg-muted:      #8a8a8a;
-  --fg-faint:      #7a7a7a;
-  --border:        #2e2e2e;
-  --border-soft:   #1c1c1c;
-  --border-strong: #5f5f5f;
-  --track:         #3a3a3a;
-  --thumb:        #fafafa;
-  --hover:        rgba(255, 255, 255, .035);
+  /* Dim - the same family as the Dim theme this extension offers X itself, so
+     the settings match the site they configure.
+
+     Three surfaces, not one: chrome (masthead, tab bar) sits on --bg-raised
+     above the page, wells (search) sit on --bg-inset below it. The previous
+     palette had --bg and --bg-raised both at #000000 and never used the
+     latter, so nothing could read as above or below anything else. */
+  --bg:            #15202b;
+  --bg-raised:     #1c2732;
+  --bg-inset:      #101a24;
+
+  /* Four levels, with real gaps. --fg-muted and --fg-faint were previously 16
+     levels apart (#8a8a8a / #7a7a7a), which collapsed the bottom two into one
+     voice - and every setting now carries a description that needs to sit
+     clearly behind its label. */
+  --fg:            #f7f9f9;
+  --fg-secondary:  #b6c2cd;
+  --fg-muted:      #8b98a5;
+  --fg-faint:      #5f7183;
+
+  --border:        #38444d;
+  --border-soft:   #22303c;
+  --border-strong: #5c6e7e;
+  --track:         #3d4d5c;
+  --thumb:        #d9e1e8;
+  --hover:        rgba(255, 255, 255, .04);
 
   --accent:       #1d9bf0;
   --accent-ink:   #ffffff;
-  --accent-glow:  rgba(29, 155, 240, .28);
+  --accent-glow:  rgba(29, 155, 240, .22);
   --ring:         rgba(29, 155, 240, .4);
-  --danger:       #e5484d;
+  /* Desaturated against a lifted surface; #e5484d reads harsh on dim. */
+  --danger:       #f4585e;
 
   --font-body: "Geist", ui-sans-serif, -apple-system, "Helvetica Neue", Arial, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
@@ -129,7 +144,8 @@ body.searching .tab-intro {
 /* ================================================================== */
 .app-brand {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 1fr auto auto auto;
+  background: var(--bg-raised);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   margin: 0;
@@ -144,9 +160,38 @@ body.searching .tab-intro {
   min-height: 48px;
 }
 .app-brand > .brand-status,
+.app-brand > .brand-toggle,
 .app-brand > .brand-version {
   border-left: 1px solid var(--border);
   justify-content: center;
+}
+
+/* Descriptions on/off. Every setting carries a description now, which is a lot
+   of text once you already know what everything does. */
+.brand-toggle {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 0;
+  color: var(--accent);
+  cursor: pointer;
+  transition: color 160ms var(--ease-out), background 160ms var(--ease-out);
+}
+.brand-toggle:hover {
+  background: var(--hover);
+}
+.brand-toggle[aria-pressed="false"] {
+  color: var(--fg-faint);
+}
+.brand-toggle:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: -2px;
+}
+body.no-descriptions p.option-info {
+  display: none;
 }
 .brand-icon {
   height: 18px;
@@ -256,7 +301,7 @@ body:not(.disabled) .master-status {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: var(--bg);
+  background: var(--bg-inset);
   padding: 0 !important;
   margin: 0 !important;
   border: 0 !important;
@@ -351,7 +396,7 @@ body.disabled #searchSection {
   position: sticky;
   top: 44px; /* sits just below the sticky #searchSection (min-height 44px) */
   z-index: 9;
-  background: var(--bg);
+  background: var(--bg-raised);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: stretch;
@@ -624,6 +669,85 @@ section.group > section > p {
   letter-spacing: .02em;
   color: var(--fg-muted);
   font-style: normal;
+}
+
+/* Injected per-setting descriptions. Keyed on the class rather than the
+   element, because the p sits at whatever depth its control does and the
+   selectors above only reach two levels down. */
+p.option-info {
+  margin: -2px 0 0;
+  padding: 0 var(--cell-pad-x) 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.55;
+  letter-spacing: .02em;
+  color: var(--fg-muted);
+  max-width: 62ch;
+}
+/* Match the label indent of nested options so the text lines up under it */
+section.group > section > section > p.option-info {
+  padding-left: calc(var(--cell-pad-x) + 16px);
+}
+
+/* ================================================================== */
+/* Before/after example markers                                        */
+/* ================================================================== */
+.option-example {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--border-soft);
+  border-radius: 50%;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  line-height: 1;
+  color: var(--fg-muted);
+  cursor: help;
+  position: relative;
+  vertical-align: middle;
+}
+.option-example:hover,
+.option-example:focus-visible {
+  color: var(--fg);
+  border-color: var(--fg-muted);
+  outline: none;
+}
+
+.option-example-panel {
+  display: none;
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  gap: 8px;
+  padding: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, .55);
+}
+.option-example:hover .option-example-panel,
+.option-example:focus-visible .option-example-panel {
+  display: flex;
+}
+
+.option-example-side {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .08em;
+  color: var(--fg-muted);
+}
+.option-example-side img {
+  display: block;
+  width: 240px;
+  height: auto;
+  border-radius: 4px;
 }
 
 /* Indent nested options */

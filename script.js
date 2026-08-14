@@ -189,6 +189,7 @@ const config = {
   replaceLogo: true,
   restoreLinkHeadlines: true,
   restoreOtherInteractionLinks: true,
+  restorePhotoGrid: true,
   restoreQuoteTweetsLink: true,
   restoreTweetSource: true,
   retweets: 'separate',
@@ -2369,8 +2370,10 @@ const Svgs = {
   TWITTER_HOME_ACTIVE_PATH: 'M12 1.696L.622 8.807l1.06 1.696L3 9.679V19.5C3 20.881 4.119 22 5.5 22h13c1.381 0 2.5-1.119 2.5-2.5V9.679l1.318.824 1.06-1.696L12 1.696zM12 16.5c-1.933 0-3.5-1.567-3.5-3.5s1.567-3.5 3.5-3.5 3.5 1.567 3.5 3.5-1.567 3.5-3.5 3.5z',
   TWITTER_HOME_INACTIVE_PATH: 'M12 9c-2.209 0-4 1.791-4 4s1.791 4 4 4 4-1.791 4-4-1.791-4-4-4zm0 6c-1.105 0-2-.895-2-2s.895-2 2-2 2 .895 2 2-.895 2-2 2zm0-13.304L.622 8.807l1.06 1.696L3 9.679V19.5C3 20.881 4.119 22 5.5 22h13c1.381 0 2.5-1.119 2.5-2.5V9.679l1.318.824 1.06-1.696L12 1.696zM19 19.5c0 .276-.224.5-.5.5h-13c-.276 0-.5-.224-.5-.5V8.429l7-4.375 7 4.375V19.5z',
   TWITTER_LOGO_PATH: 'M23.643 4.937c-.835.37-1.732.62-2.675.733.962-.576 1.7-1.49 2.048-2.578-.9.534-1.897.922-2.958 1.13-.85-.904-2.06-1.47-3.4-1.47-2.572 0-4.658 2.086-4.658 4.66 0 .364.042.718.12 1.06-3.873-.195-7.304-2.05-9.602-4.868-.4.69-.63 1.49-.63 2.342 0 1.616.823 3.043 2.072 3.878-.764-.025-1.482-.234-2.11-.583v.06c0 2.257 1.605 4.14 3.737 4.568-.392.106-.803.162-1.227.162-.3 0-.593-.028-.877-.082.593 1.85 2.313 3.198 4.352 3.234-1.595 1.25-3.604 1.995-5.786 1.995-.376 0-.747-.022-1.112-.065 2.062 1.323 4.51 2.093 7.14 2.093 8.57 0 13.255-7.098 13.255-13.254 0-.2-.005-.402-.014-.602.91-.658 1.7-1.477 2.323-2.41z',
-  X_HOME_ACTIVE_PATH: 'M21.591 7.146L12.52 1.157c-.316-.21-.724-.21-1.04 0l-9.071 5.99c-.26.173-.409.456-.409.757v13.183c0 .502.418.913.929.913H9.14c.51 0 .929-.41.929-.913v-7.075h3.909v7.075c0 .502.417.913.928.913h6.165c.511 0 .929-.41.929-.913V7.904c0-.301-.158-.584-.408-.758z',
-  X_HOME_INACTIVE_PATH: 'M21.591 7.146L12.52 1.157c-.316-.21-.724-.21-1.04 0l-9.071 5.99c-.26.173-.409.456-.409.757v13.183c0 .502.418.913.929.913h6.638c.511 0 .929-.41.929-.913v-7.075h3.008v7.075c0 .502.418.913.929.913h6.639c.51 0 .928-.41.928-.913V7.904c0-.301-.158-.584-.408-.758zM20 20l-4.5.01.011-7.097c0-.502-.418-.913-.928-.913H9.44c-.511 0-.929.41-.929.913L8.5 20H4V8.773l8.011-5.342L20 8.764z',
+  X_CHAT_ACTIVE_PATH: 'M12.001 1.5c5.858 0 10.7 4.518 10.7 10.2-.001 5.683-4.842 10.2-10.7 10.2-1.785 0-2.96-.555-3.95-1.095-1.876.768-4.02 1.2-6.245-.075l-.885-.505.523-.875c.54-.904.77-1.581.849-2.118.077-.526.02-.98-.11-1.463-.066-.25-.15-.502-.247-.788-.095-.277-.204-.59-.301-.92-.2-.674-.36-1.449-.332-2.39C1.319 6.002 6.153 1.5 12 1.5z',
+  X_CHAT_INACTIVE_PATH: 'M20.7 11.7c0-4.48-3.844-8.2-8.699-8.2-4.854 0-8.698 3.72-8.698 8.2v.015l-.001.014c-.02.667.09 1.225.25 1.767.083.28.176.545.276.839.098.285.202.595.288.918.177.663.284 1.401.156 2.271-.086.582-.274 1.191-.582 1.855 1.264.375 2.55.053 4.013-.599l.455-.203.437.242c1.07.594 1.917 1.08 3.406 1.08 4.855 0 8.7-3.72 8.7-8.199zm2 0c0 5.683-4.84 10.2-10.699 10.2-1.784 0-2.96-.555-3.95-1.095-1.876.768-4.02 1.2-6.245-.075l-.885-.505.524-.875c.54-.904.77-1.581.848-2.118.078-.526.02-.98-.11-1.463-.066-.25-.15-.502-.247-.788-.095-.277-.204-.59-.301-.92-.199-.674-.36-1.449-.332-2.39C1.322 6.002 6.154 1.5 12.002 1.5c5.859 0 10.7 4.518 10.7 10.2z',
+  X_HOME_ACTIVE_PATH: 'M10.059 2.593c1.175-.784 2.707-.784 3.882 0l6.5 4.333C21.415 7.575 22 8.668 22 9.838V18.5c0 1.933-1.567 3.5-3.5 3.5h-4.25v-5.25c0-1.243-1.007-2.25-2.25-2.25s-2.25 1.007-2.25 2.25V22H5.5C3.567 22 2 20.433 2 18.5V9.838c0-1.17.585-2.263 1.559-2.912l6.5-4.333z',
+  X_HOME_INACTIVE_PATH: 'M20 9.838c0-.502-.25-.97-.668-1.248l-6.5-4.333c-.504-.336-1.16-.336-1.664 0l-6.5 4.333C4.251 8.868 4 9.336 4 9.838V18.5c0 .828.672 1.5 1.5 1.5h3v-3.5c0-1.933 1.567-3.5 3.5-3.5s3.5 1.567 3.5 3.5V20h3c.828 0 1.5-.672 1.5-1.5V9.838zm2 8.662c0 1.933-1.567 3.5-3.5 3.5h-5v-5.5c0-.829-.672-1.5-1.5-1.5s-1.5.671-1.5 1.5V22h-5C3.567 22 2 20.433 2 18.5V9.838c0-1.17.585-2.263 1.559-2.912l6.5-4.333c1.175-.784 2.707-.784 3.882 0l6.5 4.333C21.415 7.575 22 8.668 22 9.838V18.5z',
   PLUS_PATH: 'M11 11V4h2v7h7v2h-7v7h-2v-7H4v-2h7z',
 }
 
@@ -5021,6 +5024,62 @@ const configureCss = (() => {
         // Hide the sidebar when present
         hideCssSelectors.push(`body.Sidebar${FULL_WIDTH_BODY_PSEUDO} ${Selectors.SIDEBAR}`)
       }
+      if (config.restorePhotoGrid) {
+        // X replaced the multi-photo grid with a swipeable carousel. It is a
+        // ScrollSnap list - which X also uses for the profile tab strip, hence
+        // the :has(tweetPhoto) guard, without which this would grid-ify the
+        // tabs. Video carousels are left alone; their players don't survive
+        // being squashed into a fixed cell.
+        let photoList = `${Selectors.TWEET} [data-testid="ScrollSnap-List"]:has([data-testid="tweetPhoto"]):not(:has(:is([data-testid="videoPlayer"], [data-testid="videoComponent"])))`
+        // Matched per exact photo count rather than as one guarded block: the
+        // shared rule would otherwise out-specify the row overrides (every
+        // :has() adds specificity) and force all counts into a single row.
+        let at = (n) => `${photoList}:has(> :nth-child(${n}):last-child)`
+        let counts = [2, 3, 4]
+        let anyGrid = counts.map(at).join(',\n          ')
+        let within = (suffix) => counts.map(n => `${at(n)} ${suffix}`).join(',\n          ')
+        cssRules.push(`
+          ${anyGrid} {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 2px !important;
+            scroll-snap-type: none !important;
+            /* The carousel bleeds past the column with negative margins */
+            margin: 0 !important;
+            padding: 0 !important;
+            aspect-ratio: 16 / 9 !important;
+            height: auto !important;
+            border-radius: 16px;
+            overflow: hidden !important;
+          }
+          ${at(2)} { grid-template-rows: 1fr !important; }
+          ${at(3)}, ${at(4)} { grid-template-rows: 1fr 1fr !important; }
+          /* 3 photos: tall left, two stacked right, as the old grid did */
+          ${at(3)} > :first-child { grid-row: span 2 !important; }
+          ${within('> *')} {
+            min-width: 0 !important;
+            min-height: 0 !important;
+          }
+          ${within('> * > *')} {
+            /* X sizes each slide from its photo's own aspect ratio */
+            aspect-ratio: auto !important;
+            height: 100% !important;
+            width: 100% !important;
+            border-radius: 0 !important;
+          }
+          ${within('[data-testid="tweetPhoto"]')},
+          ${within('[data-testid="tweetPhoto"] img')} {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            border-radius: 0 !important;
+          }
+        `)
+        hideCssSelectors.push(
+          `${Selectors.TWEET} [data-testid="ScrollSnap-prevButtonWrapper"]`,
+          `${Selectors.TWEET} [data-testid="ScrollSnap-nextButtonWrapper"]`,
+        )
+      }
       if (config.hideAccountSwitcher) {
         cssRules.push(`
           header[role="banner"] > div > div > div > div:last-child {
@@ -5571,6 +5630,15 @@ const configureThemeCss = (() => {
         }
         svg path[d="${Svgs.X_HOME_INACTIVE_PATH}"] {
           d: path("${Svgs.TWITTER_HOME_INACTIVE_PATH}");
+        }
+        /* X replaced the DM envelope with a Chat speech bubble. tweakMessagesIcon
+           can restore it, but only runs when redirectChatNav is on, so on
+           Chromium replaceLogo alone left the bubble in place. */
+        svg path[d="${Svgs.X_CHAT_ACTIVE_PATH}"] {
+          d: path("${Svgs.MESSAGES_ACTIVE_PATH}");
+        }
+        svg path[d="${Svgs.X_CHAT_INACTIVE_PATH}"] {
+          d: path("${Svgs.MESSAGES_INACTIVE_PATH}");
         }
       `)
       if (desktop) {
@@ -6890,7 +6958,7 @@ function processCurrentPage() {
     }
   }
 
-  if (config.redirectChatNav) {
+  if (config.redirectChatNav || (isSafari && config.replaceLogo)) {
     tweakMessagesIcon()
   }
   if (isSafari && config.replaceLogo) {
@@ -8343,7 +8411,11 @@ if ($settings) {
       debug = configChanges.debug
       log('enabled debug mode')
       configureThemeCss()
-      return
+      // Only stop here when debug is the entire change. Returning
+      // unconditionally dropped every other key in the same write - the config
+      // object was never updated and configChanged() never ran - so saving
+      // debug alongside other settings silently applied only debug.
+      if (Object.keys(configChanges).length == 1) return
     }
 
     Object.assign(config, configChanges)

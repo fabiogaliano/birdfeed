@@ -17,6 +17,8 @@
         <span class="master-status" aria-hidden="true"></span>
         <span class="status-label" aria-live="polite"></span>
       </div>
+      <button type="button" class="brand-toggle" id="descriptionsToggle" aria-pressed="true"
+              title="Show or hide the description under each setting">Info</button>
       <div class="brand-version" id="version"><span id="versionText"></span><span id="debugCountdown"></span></div>
     </div>
 
@@ -294,7 +296,7 @@
       </section>
       <section class="checkbox">
         <label>
-          <span id="reducedInteractionModeLabel">Reduced interaction mode</span>
+          <span id="reducedInteractionModeLabel">Hide all engagement buttons</span>
           <input type="checkbox" name="reducedInteractionMode">
           <span class="toggle"></span>
         </label>
@@ -429,7 +431,7 @@
     </section>
 
     <section class="group labelled" data-tab="xfixes">
-      <label id="xFixesLabel">X fixes</label>
+      <label id="xFixesLabel">Redirects &amp; layout</label>
       <section class="checkbox">
         <label>
           <span id="redirectToTwitterLabel">Redirect to twitter.com</span>
@@ -470,6 +472,10 @@
           </label>
         </section>
       </section>
+    </section>
+
+    <section class="group labelled" data-tab="xfixes">
+      <label id="twitterBrandingOptionsLabel">Twitter branding</label>
       <section class="checkbox">
         <label>
           <span id="replaceLogoLabel">Replace X branding changes</span>
@@ -486,6 +492,10 @@
           </select>
         </label>
       </section>
+    </section>
+
+    <section class="group labelled" data-tab="xfixes">
+      <label id="postsAndLinksOptionsLabel">Posts &amp; links</label>
       <section class="checkbox">
         <label>
           <span id="hideViewsLabel">Hide Views under tweets</span>
@@ -504,6 +514,13 @@
         <label>
           <span id="restoreTweetSourceLabel">Restore Tweet source label</span>
           <input type="checkbox" name="restoreTweetSource">
+          <span class="toggle"></span>
+        </label>
+      </section>
+      <section class="checkbox">
+        <label>
+          <span id="restorePhotoGridLabel">Show multiple photos as a grid instead of a carousel</span>
+          <input type="checkbox" name="restorePhotoGrid">
           <span class="toggle"></span>
         </label>
       </section>
@@ -552,6 +569,10 @@
           <span class="toggle"></span>
         </label>
       </section>
+    </section>
+
+    <section class="group labelled" data-tab="xfixes">
+      <label id="repliesOptionsLabel">Replies</label>
       <section class="select">
         <label>
           <span id="sortRepliesLabel">Default sorting of replies</span>
@@ -569,6 +590,10 @@
           <span class="toggle"></span>
         </label>
       </section>
+    </section>
+
+    <section class="group labelled" data-tab="xfixes">
+      <label id="premiumOptionsLabel">Premium &amp; blue checks</label>
       <section class="select">
         <label>
           <span id="twitterBlueChecksLabel">Premium blue checks</span>
@@ -639,16 +664,20 @@
           <span class="toggle"></span>
         </label>
       </section>
+    </section>
+
+    <section class="group labelled" data-tab="xfixes">
+      <label id="xAdditionsOptionsLabel">Grok &amp; other X additions</label>
       <section class="checkbox">
         <label>
-          <span id="hideGrokLabel">Hide Grok</span>
+          <span id="hideGrokLabel">Hide Grok in the sidebar</span>
           <input type="checkbox" name="hideGrokNav">
           <span class="toggle"></span>
         </label>
       </section>
       <section class="checkbox">
         <label>
-          <span id="hideGrokTweetsLabel">Hide Grok tweets</span>
+          <span id="hideGrokTweetsLabel">Hide posts sharing a Grok conversation</span>
           <input type="checkbox" name="hideGrokTweets">
           <span class="toggle"></span>
         </label>
@@ -977,7 +1006,7 @@
       </section>
       <section class="checkbox desktop">
         <label>
-          <span id="hideSpacesNavLabel">Create your Space</span>
+          <span id="hideSpacesNavLabel">Spaces</span>
           <input type="checkbox" name="hideSpacesNav">
           <span class="toggle"></span>
         </label>

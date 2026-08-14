@@ -78,6 +78,7 @@ export type Config = {
   restoreLinkHeadlines: boolean
   restoreQuoteTweetsLink: boolean
   restoreOtherInteractionLinks: boolean
+  restorePhotoGrid: boolean
   restoreTweetSource: boolean
   retweets: SharedTweetsConfig
   showBlueReplyFollowersCount: boolean

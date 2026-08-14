@@ -1,5 +1,10 @@
 {
   "scripts": {
+    "audit": "node ./scripts/audit/record.js",
+    "audit:resume": "node ./scripts/audit/record.js --skip-confirmed",
+    "audit:report": "node ./scripts/audit/report.js",
+    "audit:hooks": "node ./scripts/audit/hooks.js",
+    "audit:watch": "node ./scripts/audit/watch.js",
     "create-browser-action": "node ./scripts/create-browser-action.js",
     "create-store-description": "node ./scripts/create-store-description.mjs",
     "release": "node ./scripts/release.js",
@@ -25,6 +30,12 @@
   },
   "webExt": {
     "ignoreFiles": [
+      ".x-auth.json",
+      ".x-demo-profile/",
+      ".x-profile/",
+      "audit-results/",
+      "docs/",
+      "examples/",
       "CONTRIBUTING.md",
       "PRIVACY_POLICY.md",
       "README.md",
@@ -50,6 +61,7 @@
     "@types/chrome": "0.0.x",
     "@types/greasemonkey": "4.x",
     "clipboardy": "3.x",
+    "playwright": "^1.62.1",
     "semver": "7.x",
     "web-ext": "7.x"
   }

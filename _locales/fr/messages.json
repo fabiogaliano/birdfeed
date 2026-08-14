@@ -173,9 +173,6 @@
   "hideGrokLabel": {
     "message": "Masquer Grok"
   },
-  "hideGrokTweetsLabel": {
-    "message": "Masquer les tweets de Grok"
-  },
   "hideInlinePrompts": {
     "message": "Masquer les invites en ligne dans la fil"
   },
@@ -489,8 +486,5 @@
   },
   "unmuteButtonText": {
     "message": "Restaurer"
-  },
-  "xFixesLabel": {
-    "message": "Correctifs de X"
   }
 }

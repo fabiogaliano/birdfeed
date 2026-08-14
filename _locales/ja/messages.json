@@ -173,9 +173,6 @@
   "hideGrokLabel": {
     "message": "Grok を非表示にする"
   },
-  "hideGrokTweetsLabel": {
-    "message": "Grokのツイートを非表示"
-  },
   "hideInlinePrompts": {
     "message": "タイムライン内のインラインプロンプトを非表示にする"
   },
@@ -489,8 +486,5 @@
   },
   "unmuteButtonText": {
     "message": "ミュート解除"
-  },
-  "xFixesLabel": {
-    "message": "X の修正"
   }
 }
