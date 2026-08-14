@@ -470,12 +470,6 @@
   "hideTodaysNewsLabel": {
     "message": "Hide Today's News"
   },
-  "hideToggleNavigationInfo": {
-    "message": "Removes the control that collapses the left navigation."
-  },
-  "hideToggleNavigationLabel": {
-    "message": "Hide Toggle navigation"
-  },
   "hideTotalTweetsMetricsInfo": {
     "message": "Hides the post count shown under a profile name in the header."
   },
@@ -638,24 +632,6 @@
   "quoteTweetsLabel": {
     "message": "Quote Tweets"
   },
-  "redirectChatNavInfo": {
-    "message": "Makes the Chat nav item open the older Messages page instead."
-  },
-  "redirectChatNavLabel": {
-    "message": "Redirect Chat nav item to Messages"
-  },
-  "redirectToTwitterInfo": {
-    "message": "Sends x.com addresses back to twitter.com."
-  },
-  "redirectToTwitterLabel": {
-    "message": "Redirect to twitter.com"
-  },
-  "redirectTwitterLinksInfo": {
-    "message": "Rewrite twitter.com/x.com links to an alternative frontend when copying (leave empty to disable)"
-  },
-  "redirectTwitterLinksLabel": {
-    "message": "Redirect Twitter/X links to"
-  },
   "reduceAlgorithmicContentOptionsLabel": {
     "message": "Remove algorithmic content"
   },
@@ -788,12 +764,6 @@
   "sortRepliesLabel": {
     "message": "Default sorting of replies"
   },
-  "tweakNewLayoutInfo": {
-    "message": "Experimental - only enable if you have the new layout"
-  },
-  "tweakNewLayoutLabel": {
-    "message": "Tweak new layout"
-  },
   "tweakQuoteTweetsPageInfo": {
     "message": "On the Quote Tweets page, hides the original post repeated under every quote."
   },
@@ -842,8 +812,5 @@
   },
   "xAdditionsOptionsLabel": {
     "message": "Grok & other X additions"
-  },
-  "xFixesLabel": {
-    "message": "Redirects & layout"
   }
 }

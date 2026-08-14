@@ -182,9 +182,6 @@ const config = {
   mutableQuoteTweets: true,
   mutedQuotes: [],
   quoteTweets: 'ignore',
-  redirectChatNav: false,
-  redirectToTwitter: false,
-  redirectTwitterLinks: '',
   reducedInteractionMode: false,
   replaceLogo: true,
   restoreLinkHeadlines: true,
@@ -202,7 +199,6 @@ const config = {
   showPremiumReplyGovernment: true,
   sortFollowing: 'mostRecent',
   sortReplies: 'relevant',
-  tweakNewLayout: false,
   tweakQuoteTweetsPage: true,
   twitterBlueChecks: 'replace',
   unblurSensitiveContent: false,
@@ -224,7 +220,6 @@ const config = {
   hideSuggestedFollows: false,
   hideTimelineTweetBox: false,
   hideTodaysNews: false,
-  hideToggleNavigation: false,
   hideWhatsHappening: false,
   navBaseFontSize: true,
   navDensity: 'default',
@@ -235,45 +230,6 @@ const config = {
   preventNextVideoAutoplay: true,
 }
 //#endregion
-
-/** Tracking parameters Twitter appends to URLs for analytics */
-const TRACKING_PARAMS = ['s', 't', 'ref_src', 'ref_url', 'src', 'cxt', 'vertical', 'mx']
-
-/**
- * @param {string} urlString
- * @param {string | null} targetDomain
- * @returns {string}
- */
-function cleanTwitterUrl(urlString, targetDomain) {
-  try {
-    let url = new URL(urlString)
-    for (let param of TRACKING_PARAMS) {
-      url.searchParams.delete(param)
-    }
-    let search = url.searchParams.toString()
-    let domain = targetDomain || url.hostname
-    return `https://${domain}${url.pathname}${search ? '?' + search : ''}${url.hash}`
-  } catch (e) {
-    return urlString
-  }
-}
-
-document.addEventListener('copy', function(e) {
-  if (!config.enabled || !config.redirectTwitterLinks) return
-
-  let selection = window.getSelection()?.toString() || ''
-  let urlPattern = /https?:\/\/(www\.)?(twitter\.com|x\.com|mobile\.twitter\.com|mobile\.x\.com)(\/[^\s]*)?/gi
-
-  if (urlPattern.test(selection)) {
-    urlPattern.lastIndex = 0
-    let targetDomain = config.redirectTwitterLinks.trim().replace(/^https?:\/\//, '')
-    let newText = selection.replace(urlPattern, (match) => cleanTwitterUrl(match, targetDomain))
-    if (newText !== selection) {
-      e.preventDefault()
-      e.clipboardData?.setData('text/plain', newText)
-    }
-  }
-}, true)
 
 //#region Locales
 /**
@@ -3688,41 +3644,7 @@ async function observeSidebar() {
   })
 }
 
-const observeSideNavChatLink = (() => {
-  /** @type {MutationObserver} */
-  let observer
-
-  return async function observeSideNavChatLink() {
-    if (observer) {
-      observer.disconnect()
-      observer = null
-    }
-
-    if (!desktop || !config.redirectChatNav) return
-
-    // This element is updated when text is added or removed on resize
-    let $linkTextContainer = await getElement('a[data-testid="AppTabBar_DirectMessage_Link"] > div', {
-      name: 'sidenav Chat link text container',
-    })
-    observer = observeElement($linkTextContainer, () => {
-      if ($linkTextContainer.childElementCount > 1) {
-        let $linkText = /** @type {HTMLElement} */ ($linkTextContainer.querySelector('div[dir]:not([aria-live]) > span'))
-        if ($linkText) {
-          $linkText.textContent = getString('MESSAGES')
-        } else {
-          warn('could not find Chat link text')
-        }
-      }
-    }, {
-      leading: true,
-      name: 'sidenav Chat link',
-      observers: globalObservers,
-    })
-  }
-})()
-
 function observeSideNavItems() {
-  observeSideNavChatLink()
   observeSideNavTweetButton()
 }
 
@@ -4232,17 +4154,6 @@ function patchHistory() {
           args[0].pathname = args[0].pathname.replace(/verified_followers$/, 'followers')
         }
       }
-      if (config.redirectChatNav) {
-        if (typeof args[0] == 'object' && args[0].pathname == '/i/chat') {
-          log('Redirecting Chat to Messages')
-          args[0].pathname = desktop ? '/messages/home' : '/messages'
-        }
-        // Back button from Message requests
-        else if (desktop && args[0] === '/messages') {
-          log('Redirecting /messages to Messages')
-          args[0] = '/messages/home'
-        }
-      }
     }
     return History_push(...args)
   }
@@ -4674,8 +4585,8 @@ const configureCss = (() => {
         // Upsell on the Likes tab in your own profile
         `body.OwnProfile ${Selectors.PRIMARY_COLUMN} nav + div:has(a[href^="/i/premium"])`,
       )
-      if (desktop && config.tweakNewLayout) {
-        // In new More dialog
+      if (desktop) {
+        // In the More dialog
         hideCssSelectors.push(`${Selectors.MORE_DIALOG} a:is([href^="/i/premium"], [href^="/i/verified"])`)
       }
       // Hide Highlights and Articles tabs in your own profile if you don't have Premium
@@ -4835,107 +4746,8 @@ const configureCss = (() => {
       }
     }
 
-    if (hasNewLayout() && config.tweakNewLayout) {
-      cssRules.push(`
-        /* Make the image button first in the Tweet editor toolbar again */
-        [data-testid="toolBar"] [role="tablist"] > [role="presentation"] {
-          order: 1;
-        }
-        [data-testid="toolBar"] [role="tablist"] > [role="presentation"]:has(input[data-testid="fileInput"]) {
-          order: 0;
-        }
-      `)
-      if (config.replaceLogo) {
-        cssRules.push(`
-          /* Add theme colour back to Tweet editor toolbar buttons */
-          [data-testid="toolBar"] [role="tablist"] > [role="presentation"] svg {
-            fill: var(--cpft-theme);
-          }
-        `)
-      }
-    }
-
     //#region Desktop-only
     if (desktop) {
-      if (hasNewLayout() && config.tweakNewLayout) {
-        cssRules.push(`
-          /* Realign nav items to the top */
-          header[role="banner"] > div > div > div {
-            justify-content: flex-start;
-          }
-          /* Restore size and constrast of main nav icons and More button */
-          ${Selectors.PRIMARY_NAV_DESKTOP} > :is(a, button) svg {
-            width: 1.75rem !important;
-            height: 1.75rem !important;
-            fill: var(--cpft-text-primary) !important;
-          }
-          /* Restore contrast of main nav text when expanded */
-          ${Selectors.PRIMARY_NAV_DESKTOP} > :is(a, button) div[dir]:not([aria-live]) {
-            color: var(--cpft-text-primary) !important;
-          }
-          /* Give other nav button icons more contrast too */
-          header[role="banner"] button svg {
-            fill: var(--cpft-text-primary) !important;
-          }
-          /* Make the Tweet button larger */
-          [data-testid="SideNav_NewTweet_Button"] {
-            min-width: 49px;
-            min-height: 49px;
-          }
-          /* Move the account switcher back to the bottom */
-          header[role="banner"] > div > div > div > div:last-child {
-            flex: 1;
-            justify-content: space-between;
-          }
-          /* Restore primary column borders */
-          header[role="banner"] > div > div > div  {
-            border-right: 1px solid var(--cpft-border);
-          }
-          ${Selectors.PRIMARY_COLUMN} {
-            border-right: 1px solid var(--cpft-border);
-          }
-          /* Left-align main contents and stop it taking up all available space */
-          main {
-            align-items: flex-start !important;
-            flex-grow: 0 !important;
-          }
-          /* Remove the gap between main contents and sidebar */
-          main > div > div > div {
-            justify-content: normal !important;
-          }
-          /* Restore the sidebar to its old width */
-          ${Selectors.SIDEBAR},
-          ${Selectors.SIDEBAR} > div > div,
-          .SidebarContents > div:first-child {
-            width: 350px !important;
-          }
-          /* Center content */
-          div[data-at-shortcutkeys] {
-            justify-content: center;
-          }
-        `)
-        if (config.replaceLogo) {
-          // TODO Manually patch Tweet button SVG in Safari
-          cssRules.push(`
-            /* Restore theme colour in nav item pips */
-            ${Selectors.PRIMARY_NAV_DESKTOP} > :is(a[href^="/notifications"], a[href="/messages"]) div[aria-live],
-            ${Selectors.MORE_DIALOG} :is(a[href^="/notifications"], a[href="/messages"]) div[aria-live],
-            /* Restore theme colour in profile switcher other accounts have notifications pip */
-            button[data-testid="SideNav_AccountSwitcher_Button"] > div > div[aria-label],
-            /* Restore theme colour in account switcher notifications pips */
-            [data-testid="HoverCard"] button[data-testid="UserCell"] div[aria-live] {
-              background-color: var(--cpft-theme);
-            }
-            /* Replace the plus icon in the Tweet button with the feather */
-            [data-testid="SideNav_NewTweet_Button"] path[d="${Svgs.PLUS_PATH}"] {
-              d: path("${Svgs.TWITTER_FEATHER_PLUS_PATH}");
-            }
-          `)
-        }
-      }
-      if (hasNewLayout() && config.hideToggleNavigation) {
-        hideCssSelectors.push('header[role="banner"] > div > div > div > div:first-child > button')
-      }
       if (config.navDensity == 'comfortable' || config.navDensity == 'compact') {
         cssRules.push(`
           header nav > a,
@@ -5100,8 +4912,8 @@ const configureCss = (() => {
           `body.Explore ${Selectors.TIMELINE}`,
         )
       }
-      if (config.hideAdsNav && config.tweakNewLayout) {
-        // In new More dialog
+      if (config.hideAdsNav) {
+        // In the More dialog
         hideCssSelectors.push(`${Selectors.MORE_DIALOG} a:is([href*="ads.twitter.com"], [href*="ads.x.com"])`)
       }
       if (config.hideComposeTweet) {
@@ -5116,31 +4928,23 @@ const configureCss = (() => {
           // Grok drawer
           'div[data-testid="GrokDrawer"]',
         )
-        if (config.tweakNewLayout) {
-          // In new More dialog
-          hideCssSelectors.push(`${Selectors.MORE_DIALOG} a[href$="/i/grok"]`)
-        }
+        // In the More dialog
+        hideCssSelectors.push(`${Selectors.MORE_DIALOG} a[href$="/i/grok"]`)
       }
       if (config.hideJobsNav) {
         hideCssSelectors.push(`${Selectors.PRIMARY_NAV_DESKTOP} a[href="/jobs"]`)
-        if (config.tweakNewLayout) {
-          // In new More dialog
-          hideCssSelectors.push(`${Selectors.MORE_DIALOG} a[href="/jobs"]`)
-        }
+        // In the More dialog
+        hideCssSelectors.push(`${Selectors.MORE_DIALOG} a[href="/jobs"]`)
       }
       if (config.hideListsNav) {
         hideCssSelectors.push(`${Selectors.PRIMARY_NAV_DESKTOP} a[href$="/lists"]`)
-        if (config.tweakNewLayout) {
-          // In new More dialog
-          hideCssSelectors.push(`${Selectors.MORE_DIALOG} a[href$="/lists"]`)
-        }
+        // In the More dialog
+        hideCssSelectors.push(`${Selectors.MORE_DIALOG} a[href$="/lists"]`)
       }
       if (config.hideSpacesNav) {
         hideCssSelectors.push(`${menuRole} a[href="/i/spaces/start"]`)
-        if (config.tweakNewLayout) {
-          // In new More dialog
-          hideCssSelectors.push(`${Selectors.MORE_DIALOG} a[href="/i/spaces/start"]`)
-        }
+        // In the More dialog
+        hideCssSelectors.push(`${Selectors.MORE_DIALOG} a[href="/i/spaces/start"]`)
       }
       if (config.hideTwitterBlueUpsells) {
         hideCssSelectors.push(
@@ -5204,24 +5008,18 @@ const configureCss = (() => {
         // when on a page full-width content is enabled on.
         let bodySelector = `${config.hideExploreNavWithSidebar ? `body.Sidebar${config.fullWidthContent ? `:not(${FULL_WIDTH_BODY_PSEUDO})` : ''} ` : ''}`
         hideCssSelectors.push(`${bodySelector}${Selectors.PRIMARY_NAV_DESKTOP} a[href="/explore"]`)
-        if (config.tweakNewLayout) {
-          // In new More dialog
-          hideCssSelectors.push(`${Selectors.MORE_DIALOG} a[href="/explore"]`)
-        }
+        // In the More dialog
+        hideCssSelectors.push(`${Selectors.MORE_DIALOG} a[href="/explore"]`)
       }
       if (config.hideBookmarksNav) {
         hideCssSelectors.push(`${Selectors.PRIMARY_NAV_DESKTOP} a[href="/i/bookmarks"]`)
-        if (config.tweakNewLayout) {
-          // In new More dialog
-          hideCssSelectors.push(`${Selectors.MORE_DIALOG} a[href="/i/bookmarks"]`)
-        }
+        // In the More dialog
+        hideCssSelectors.push(`${Selectors.MORE_DIALOG} a[href="/i/bookmarks"]`)
       }
       if (config.hideCommunitiesNav) {
         hideCssSelectors.push(`${Selectors.PRIMARY_NAV_DESKTOP} a[href$="/communities"]`)
-        if (config.tweakNewLayout) {
-          // In new More dialog
-          hideCssSelectors.push(`${Selectors.MORE_DIALOG} a[href$="/communities"]`)
-        }
+        // In the More dialog
+        hideCssSelectors.push(`${Selectors.MORE_DIALOG} a[href$="/communities"]`)
       }
       if (config.hideMessagesDrawer) {
         cssRules.push(`div:is([data-testid="DMDrawer"], [data-testid="chat-drawer-root"]) { visibility: hidden; }`)
@@ -5242,27 +5040,6 @@ const configureCss = (() => {
 
     //#region Mobile only
     if (mobile) {
-      if (hasNewLayout() && config.tweakNewLayout) {
-        cssRules.push(`
-          /* Remove new padding from profile details and the tab bar (this has to be accidental) */
-          body.Profile ${Selectors.PRIMARY_COLUMN} > div > div > div > div > div > div > div > div {
-            padding-left: 0;
-            padding-right: 0;
-          }
-        `)
-        if (config.replaceLogo) {
-          cssRules.push(`
-            /* Restore theme colour in nav item pips */
-            ${Selectors.PRIMARY_NAV_MOBILE} > :is(a[href^="/notifications"], a[href="/messages"]) div[aria-label],
-            /* Restore theme colour in profile button other accounts have notifications pip */
-            button[data-testid="DashButton_ProfileIcon_Link"] div[aria-label],
-            /* Restore theme colour in account switcher notifications pips */
-            [role="dialog"] [data-testid^="UserAvatar-Container"] div[dir] {
-              background-color: var(--cpft-theme);
-            }
-          `)
-        }
-      }
       if (config.disableHomeTimeline) {
         hideCssSelectors.push(`${Selectors.PRIMARY_NAV_MOBILE} a[href="/home"]`)
       }
@@ -5632,8 +5409,8 @@ const configureThemeCss = (() => {
           d: path("${Svgs.TWITTER_HOME_INACTIVE_PATH}");
         }
         /* X replaced the DM envelope with a Chat speech bubble. tweakMessagesIcon
-           can restore it, but only runs when redirectChatNav is on, so on
-           Chromium replaceLogo alone left the bubble in place. */
+           can restore it, but only runs on Safari, which ignores the d: property
+           these rules rely on. */
         svg path[d="${Svgs.X_CHAT_ACTIVE_PATH}"] {
           d: path("${Svgs.MESSAGES_ACTIVE_PATH}");
         }
@@ -6958,7 +6735,7 @@ function processCurrentPage() {
     }
   }
 
-  if (config.redirectChatNav || (isSafari && config.replaceLogo)) {
+  if (isSafari && config.replaceLogo) {
     tweakMessagesIcon()
   }
   if (isSafari && config.replaceLogo) {
@@ -7034,27 +6811,6 @@ function processCurrentPage() {
       tweakProfileSettingsPage()
     }
   }
-}
-
-/**
- * @returns {boolean} `true` if this call replaces the current location
- */
-function redirectToTwitter() {
-  if (config.redirectToTwitter &&
-      location.hostname.endsWith('x.com') &&
-      // Don't redirect the path used by the OldTweetDeck extension
-      location.pathname != '/i/tweetdeck') {
-    // If we got a logout redirect from twitter.com, redirect back to the login page
-    let pathname = location.search.includes('logout=') ? '/i/flow/login' : location.pathname || PagePaths.HOME
-    let searchParams = new URLSearchParams(location.search)
-    searchParams.delete('logout')
-    searchParams.set('mx', '1')
-    let redirectUrl = `https://twitter.com${pathname}?${searchParams}`
-    log('redirectToTwitter: redirecting from', location.href, 'to', redirectUrl)
-    location.replace(redirectUrl)
-    return true
-  }
-  return false
 }
 
 /**
@@ -8214,11 +7970,6 @@ async function main() {
   fontSize = null
   lastFlexDirection = null
 
-  // Don't run if we're redirecting to twitter.com
-  if (redirectToTwitter()) {
-    return
-  }
-
   observeFavicon()
   observeTitle()
   observeThemeMeta()
@@ -8331,10 +8082,6 @@ function configChanged(changes) {
       disconnectObservers(pageObservers, 'page')
       disconnectObservers(globalObservers, 'global')
     }
-    return
-  }
-
-  if ('redirectToTwitter' in changes && redirectToTwitter()) {
     return
   }
 

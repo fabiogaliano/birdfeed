@@ -266,9 +266,6 @@
   "hideTodaysNewsLabel": {
     "message": "隐藏今日新闻"
   },
-  "hideToggleNavigationLabel": {
-    "message": "隐藏切换导航"
-  },
   "hideTwitterBlueRepliesLabel": {
     "message": "隐藏Premium蓝色勾号回复"
   },
@@ -383,12 +380,6 @@
   "quoteTweetsLabel": {
     "message": "引用推文"
   },
-  "redirectChatNavLabel": {
-    "message": "将聊天导航项重定向至消息"
-  },
-  "redirectToTwitterLabel": {
-    "message": "重定向到 twitter.com"
-  },
   "reduceAlgorithmicContentOptionsLabel": {
     "message": "删除算法性内容"
   },
@@ -465,12 +456,6 @@
   },
   "sortRepliesLabel": {
     "message": "回复的默认排序"
-  },
-  "tweakNewLayoutInfo": {
-    "message": "实验性功能 - 仅在您拥有新布局时启用"
-  },
-  "tweakNewLayoutLabel": {
-    "message": "调整新布局"
   },
   "tweakQuoteTweetsPageLabel": {
     "message": "查看引用推文时隐藏被引用的推文"

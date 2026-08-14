@@ -111,7 +111,6 @@ for (let translationId of [
   'hideSuggestedFollowsLabel',
   'hideTimelineTweetBoxLabel',
   'hideTodaysNewsLabel',
-  'hideToggleNavigationLabel',
   'hideTwitterBlueRepliesLabel',
   'hideTwitterBlueUpsellsLabel',
   'hideUnavailableQuoteTweetsLabel',
@@ -129,10 +128,6 @@ for (let translationId of [
   'preventNextVideoAutoplayInfo',
   'preventNextVideoAutoplayLabel',
   'quoteTweetsLabel',
-  'redirectChatNavLabel',
-  'redirectToTwitterLabel',
-  'redirectTwitterLinksLabel',
-  'redirectTwitterLinksInfo',
   'reduceAlgorithmicContentOptionsLabel',
   'reduceEngagementOptionsLabel',
   'reducedInteractionModeInfo',
@@ -154,8 +149,6 @@ for (let translationId of [
   'sidebarLabel',
   'sortFollowingLabel',
   'sortRepliesLabel',
-  'tweakNewLayoutInfo',
-  'tweakNewLayoutLabel',
   'tweakQuoteTweetsPageLabel',
   'twitterBlueChecksLabel',
   'twitterBlueChecksOption_replace',
@@ -165,7 +158,6 @@ for (let translationId of [
   'uninvertFollowButtonsLabel',
   'unwrapTcoLinksLabel',
   'unwrapTcoLinksInfo',
-  'xFixesLabel',
   'twitterBrandingOptionsLabel',
   'postsAndLinksOptionsLabel',
   'repliesOptionsLabel',
@@ -403,9 +395,6 @@ const defaultConfig = {
   mutableQuoteTweets: true,
   mutedQuotes: [],
   quoteTweets: 'ignore',
-  redirectChatNav: false,
-  redirectToTwitter: false,
-  redirectTwitterLinks: '',
   reducedInteractionMode: false,
   unwrapTcoLinks: false,
   replaceLogo: true,
@@ -424,7 +413,6 @@ const defaultConfig = {
   showPremiumReplyGovernment: true,
   sortFollowing: 'mostRecent',
   sortReplies: 'relevant',
-  tweakNewLayout: false,
   tweakQuoteTweetsPage: true,
   twitterBlueChecks: 'replace',
   uninvertFollowButtons: true,
@@ -445,7 +433,6 @@ const defaultConfig = {
   hideSuggestedFollows: false,
   hideTimelineTweetBox: false,
   hideTodaysNews: false,
-  hideToggleNavigation: false,
   hideWhatsHappening: false,
   navBaseFontSize: true,
   navDensity: 'default',
@@ -781,7 +768,6 @@ function updateDisplay() {
   $body.classList.toggle('mutingQuotes', shouldDisplayMutedQuotes())
   $body.classList.toggle('showingBlueReplyFollowersCount', optionsConfig.showBlueReplyFollowersCount)
   $body.classList.toggle('showingSidebarContent', !optionsConfig.hideSidebarContent)
-  $body.classList.toggle('tweakingNewLayout', optionsConfig.tweakNewLayout)
   $body.classList.toggle('uninvertedFollowButtons', optionsConfig.uninvertFollowButtons)
   $showBlueReplyFollowersCountLabel.textContent = chrome.i18n.getMessage(
     'showBlueReplyFollowersCountLabel',

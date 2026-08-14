@@ -54,11 +54,8 @@ const DESCRIPTIONS = {
   hideSuggestedContentSearch: 'Removes suggested posts and accounts injected into search results.',
   defaultToLatestSearch: 'Opens search results on "Latest" instead of "Top", so results are in time order.',
   tweakQuoteTweetsPage: 'On the Quote Tweets page, hides the original post repeated under every quote.',
-  redirectToTwitter: 'Sends x.com addresses back to twitter.com.',
-  redirectChatNav: 'Makes the Chat nav item open the older Messages page instead.',
 
   // --- Branding ---
-  hideToggleNavigation: 'Removes the control that collapses the left navigation.',
   replaceLogo: 'Puts the Twitter bird back in place of the X logo, and restores the home and messages icons that came with it.',
   darkModeTheme: 'Which dark theme to use: dim or lights out.',
   hideViews: 'Hides the view count shown under posts.',

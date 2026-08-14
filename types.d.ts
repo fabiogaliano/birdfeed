@@ -69,9 +69,6 @@ export type Config = {
   mutableQuoteTweets: boolean
   mutedQuotes: QuotedTweet[]
   quoteTweets: SharedTweetsConfig
-  redirectChatNav: boolean
-  redirectToTwitter: boolean
-  redirectTwitterLinks: string
   reducedInteractionMode: boolean
   // XXX This now controls all replacement of X brand changes
   replaceLogo: boolean
@@ -90,7 +87,6 @@ export type Config = {
   showPremiumReplyGovernment: boolean
   sortFollowing: 'mostRecent' | 'popular' | 'ignore'
   sortReplies: 'relevant' | 'recent' | 'liked'
-  tweakNewLayout: boolean
   tweakQuoteTweetsPage: boolean
   twitterBlueChecks: 'ignore' | 'replace' | 'hide'
   unblurSensitiveContent: boolean
@@ -111,7 +107,6 @@ export type Config = {
   hideSuggestedFollows: boolean
   hideTimelineTweetBox: boolean
   hideTodaysNews: boolean
-  hideToggleNavigation: boolean
   hideWhatsHappening: boolean
   navBaseFontSize: boolean
   navDensity: 'default' | 'comfortable' | 'compact'

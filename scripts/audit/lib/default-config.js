@@ -20,11 +20,9 @@ function readDefaultConfig() {
 // Settings that can't be measured by flipping them in place.
 const UNPROBEABLE = {
   enabled: 'configChanged() returns early and tears down every observer',
-  redirectToTwitter: 'navigates away from x.com',
   hideQuotesFrom: 'user data, not a toggle',
   mutedQuotes: 'user data, not a toggle',
   customCss: 'freeform user CSS',
-  redirectTwitterLinks: 'freeform domain string',
   debug: 'debug output only',
   debugLogTimelineStats: 'debug output only',
   version: 'set by the extension, not the user',

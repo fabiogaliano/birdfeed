@@ -266,9 +266,6 @@
   "hideTodaysNewsLabel": {
     "message": "Masquer les Actualités du jour"
   },
-  "hideToggleNavigationLabel": {
-    "message": "Masquer activer/désactiver la navigation"
-  },
   "hideTwitterBlueRepliesLabel": {
     "message": "Masquer les réponses des coches bleus Premium"
   },
@@ -374,12 +371,6 @@
   "quoteTweetsLabel": {
     "message": "Tweets de citation"
   },
-  "redirectChatNavLabel": {
-    "message": "Rediriger l'élément Chat vers Messages"
-  },
-  "redirectToTwitterLabel": {
-    "message": "Rediriger vers twitter.com"
-  },
   "reduceAlgorithmicContentOptionsLabel": {
     "message": "Supprimer le contenu algorithmique"
   },
@@ -453,12 +444,6 @@
   },
   "sortRepliesLabel": {
     "message": "Tri par défaut des réponses"
-  },
-  "tweakNewLayoutInfo": {
-    "message": "Expérimental - n'activez que si vous avez la nouvelle mise en page"
-  },
-  "tweakNewLayoutLabel": {
-    "message": "Ajuster la nouvelle mise en page"
   },
   "tweakQuoteTweetsPageLabel": {
     "message": "Masquer le tweet cité lors de l'affichage des citations de tweets"
