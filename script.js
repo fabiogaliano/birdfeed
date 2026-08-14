@@ -4850,7 +4850,27 @@ const configureCss = (() => {
         let counts = [2, 3, 4]
         let anyGrid = counts.map(at).join(',\n          ')
         let within = (suffix) => counts.map(n => `${at(n)} ${suffix}`).join(',\n          ')
+        // X reserves the carousel's height on an ancestor using a percentage
+        // padding-bottom, with the carousel absolutely positioned inside it -
+        // so sizing the list alone leaves a carousel-tall hole above the action
+        // bar. Restating that percentage as the grid's 16:9 is enough; taking
+        // the carousel out of absolute positioning instead collapses the whole
+        // wrapper chain to zero.
+        //
+        // The guards are stacked flat rather than reusing the list selector
+        // above: :has() may not contain another :has(), and one nested pair
+        // silently invalidates the entire rule.
+        let inNav = (suffix) => `> nav [data-testid="ScrollSnap-List"] ${suffix}`
+        let spacer = [
+          `${Selectors.TWEET} div:has(${inNav('[data-testid="tweetPhoto"]')})`,
+          `:has(${inNav('> :nth-child(2)')})`,
+          `:not(:has(${inNav('> :nth-child(5)')}))`,
+          `:not(:has(> nav :is([data-testid="videoPlayer"], [data-testid="videoComponent"])))`,
+        ].join('')
         cssRules.push(`
+          ${spacer} {
+            padding-bottom: 56.25% !important;
+          }
           ${anyGrid} {
             display: grid !important;
             grid-template-columns: 1fr 1fr !important;
