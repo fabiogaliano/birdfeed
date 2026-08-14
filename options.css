@@ -31,6 +31,9 @@
   --accent:       #1d9bf0;
   --accent-ink:   #ffffff;
   --accent-glow:  rgba(29, 155, 240, .22);
+  /* Tint for a surface that sits behind accent-coloured text, where the glow
+     is strong enough to eat the contrast. */
+  --accent-soft:  rgba(29, 155, 240, .10);
   --ring:         rgba(29, 155, 240, .4);
   /* Desaturated against a lifted surface; #e5484d reads harsh on dim. */
   --danger:       #f4585e;
@@ -145,7 +148,7 @@ body.searching .tab-intro {
 /* ================================================================== */
 .app-brand {
   display: grid;
-  grid-template-columns: 1fr auto auto auto;
+  grid-template-columns: 1fr auto auto;
   background: var(--bg-raised);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
@@ -161,36 +164,11 @@ body.searching .tab-intro {
   min-height: 48px;
 }
 .app-brand > .brand-status,
-.app-brand > .brand-toggle,
 .app-brand > .brand-version {
   border-left: 1px solid var(--border);
   justify-content: center;
 }
 
-/* Descriptions on/off. Every setting carries a description now, which is a lot
-   of text once you already know what everything does. */
-.brand-toggle {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  background: transparent;
-  border: 0;
-  color: var(--accent);
-  cursor: pointer;
-  transition: color 160ms var(--ease-out), background 160ms var(--ease-out);
-}
-.brand-toggle:hover {
-  background: var(--hover);
-}
-.brand-toggle[aria-pressed="false"] {
-  color: var(--fg-faint);
-}
-.brand-toggle:focus-visible {
-  outline: 1px solid var(--accent);
-  outline-offset: -2px;
-}
 body.no-descriptions p.option-info {
   display: none;
 }
@@ -325,6 +303,8 @@ body:not(.disabled) .master-status {
   position: sticky;
   top: 0;
   z-index: 10;
+  display: flex;
+  align-items: stretch;
   background: var(--bg-inset);
   padding: 0 !important;
   margin: 0 !important;
@@ -334,6 +314,8 @@ body:not(.disabled) .master-status {
 .search-wrap {
   position: relative;
   display: flex;
+  flex: 1;
+  min-width: 0;
   align-items: center;
   padding: 0 var(--cell-pad-x);
   background: transparent;
@@ -408,6 +390,57 @@ body:not(.disabled) .master-status {
   font-weight: 500;
   letter-spacing: .1em;
   text-transform: uppercase;
+}
+/* Descriptions on/off. Every setting carries a description now, which is a lot
+   of text once you already know what everything does.
+
+   Shares the search row rather than the header: both control what the list of
+   settings shows rather than what the extension does, and the row is sticky, so
+   it stays reachable once you have scrolled past the header. */
+.descriptions-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 0 var(--cell-pad-x);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 0;
+  border-left: 1px solid var(--border);
+  color: var(--fg-faint);
+  cursor: pointer;
+  transition: color 160ms var(--ease-out), background 160ms var(--ease-out);
+}
+.descriptions-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+.descriptions-toggle[aria-pressed="true"] {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.descriptions-toggle:hover {
+  color: var(--fg-secondary);
+  background: var(--hover);
+}
+.descriptions-toggle[aria-pressed="true"]:hover {
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+.descriptions-toggle:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: -2px;
+}
+/* Narrow window: the icon alone still reads as on or off by colour */
+@media (max-width: 620px) {
+  .descriptions-label {
+    display: none;
+  }
 }
 body.disabled #searchSection {
   display: none;
