@@ -49,12 +49,14 @@
       "manifest.mv2.json",
       "manifest.mv3.json",
       "package-lock.json",
+      "pnpm-lock.yaml",
       "package.json",
       "promo/",
       "safari/",
       "screenshots/",
       "scripts/",
-      "types.d.ts"
+      "types.d.ts",
+      "web-ext-artifacts/"
     ]
   },
   "devDependencies": {
