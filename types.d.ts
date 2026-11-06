@@ -23,6 +23,7 @@ export type Config = {
   hideBookmarkMetrics: boolean
   hideBookmarksNav: boolean
   hideBusinessNav: boolean
+  hideCallsNav: boolean
   hideChatNav: boolean
   hideCommunitiesNav: boolean
   hideComposeTweet: boolean
@@ -68,6 +69,8 @@ export type Config = {
   listRetweets: 'ignore' | 'hide'
   mutableQuoteTweets: boolean
   mutedQuotes: QuotedTweet[]
+  oneClickBlockButton: boolean
+  oneClickMuteButton: boolean
   quoteTweets: SharedTweetsConfig
   reducedInteractionMode: boolean
   // XXX This now controls all replacement of X brand changes
@@ -127,12 +130,14 @@ export type LocaleKey =
   | 'ACCOUNT_BASED_IN_FN'
   | 'ADD_ANOTHER_TWEET'
   | 'ADD_MUTED_WORD'
+  | 'BLOCK'
   | 'GROK_ACTIONS'
   | 'HOME'
   | 'LIKES'
   | 'LIVE_ON_X'
   | 'MESSAGES'
   | 'MOST_RELEVANT'
+  | 'MUTE'
   | 'MUTE_THIS_CONVERSATION'
   | 'POST_ALL'
   | 'POST_UNAVAILABLE'
@@ -163,7 +168,9 @@ export type LocaleKey =
   | 'TWEET_INTERACTIONS'
   | 'TWEET_YOUR_REPLY'
   | 'TWITTER'
+  | 'UNBLOCK'
   | 'UNDO_RETWEET'
+  | 'UNMUTE'
   | 'VIEW'
   | 'WHATS_HAPPENING'
 

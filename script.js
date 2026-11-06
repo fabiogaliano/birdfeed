@@ -140,6 +140,7 @@ const config = {
   hideBookmarkMetrics: true,
   hideBookmarksNav: false,
   hideBusinessNav: true,
+  hideCallsNav: true,
   hideChatNav: false,
   hideCommunitiesNav: false,
   hideComposeTweet: false,
@@ -181,6 +182,8 @@ const config = {
   listRetweets: 'ignore',
   mutableQuoteTweets: true,
   mutedQuotes: [],
+  oneClickBlockButton: true,
+  oneClickMuteButton: true,
   quoteTweets: 'ignore',
   reducedInteractionMode: false,
   replaceLogo: true,
@@ -631,12 +634,14 @@ const locales = {
     },
     ADD_ANOTHER_TWEET: 'Add another Tweet',
     ADD_MUTED_WORD: 'Add muted word',
+    BLOCK: 'Block',
     GROK_ACTIONS: 'Grok actions',
     HOME: 'Home',
     LIKES: 'Likes',
     LIVE_ON_X: 'Live on X',
     MESSAGES: 'Messages',
     MOST_RELEVANT: 'Most relevant',
+    MUTE: 'Mute',
     MUTE_THIS_CONVERSATION: 'Mute this conversation',
     POST_ALL: 'Post all',
     POST_UNAVAILABLE: 'This post is unavailable.',
@@ -667,7 +672,9 @@ const locales = {
     TWEET_INTERACTIONS: 'Tweet interactions',
     TWEET_YOUR_REPLY: 'Tweet your reply',
     TWITTER: 'Twitter',
+    UNBLOCK: 'Unblock',
     UNDO_RETWEET: 'Undo Retweet',
+    UNMUTE: 'Unmute',
     VIEW: 'View',
     WHATS_HAPPENING: "What's happening?",
   },
@@ -2297,6 +2304,9 @@ const Selectors = {
   MODAL_TIMELINE: 'section > h1 + div[aria-label] > div',
   MOBILE_TIMELINE_HEADER: 'div[data-testid="TopNavBar"]',
   MORE_DIALOG: 'div[aria-labelledby="modal-header"]',
+  // The Mute item has no data-testid and its label varies by language, but its
+  // icon doesn't. The Unmute item uses a different icon, so this never matches it.
+  MUTE_MENU_ITEM: '[role="menuitem"]:has(path[d^="M16 22h-2.35l-.275-.219"])',
   NAV_HOME_LINK: 'a[data-testid="AppTabBar_Home_Link"]',
   NAV_MESSAGES_LINK: 'a[data-testid="AppTabBar_DirectMessage_Link"]',
   PRIMARY_COLUMN: 'div[data-testid="primaryColumn"]',
@@ -2318,7 +2328,10 @@ const Svgs = {
   BLUE_LOGO_PATH: 'M16.5 3H2v18h15c3.038 0 5.5-2.46 5.5-5.5 0-1.4-.524-2.68-1.385-3.65-.08-.09-.089-.22-.023-.32.574-.87.908-1.91.908-3.03C22 5.46 19.538 3 16.5 3zm-.796 5.99c.457-.05.892-.17 1.296-.35-.302.45-.684.84-1.125 1.15.004.1.006.19.006.29 0 2.94-2.269 6.32-6.421 6.32-1.274 0-2.46-.37-3.459-1 .177.02.357.03.539.03 1.057 0 2.03-.35 2.803-.95-.988-.02-1.821-.66-2.109-1.54.138.03.28.04.425.04.206 0 .405-.03.595-.08-1.033-.2-1.811-1.1-1.811-2.18v-.03c.305.17.652.27 1.023.28-.606-.4-1.004-1.08-1.004-1.85 0-.4.111-.78.305-1.11 1.113 1.34 2.775 2.22 4.652 2.32-.038-.17-.058-.33-.058-.51 0-1.23 1.01-2.22 2.256-2.22.649 0 1.235.27 1.647.7.514-.1.997-.28 1.433-.54-.168.52-.526.96-.992 1.23z',
   MESSAGES_ACTIVE_PATH: 'M1.998 4.499c0-.828.671-1.499 1.5-1.499h17c.828 0 1.5.671 1.5 1.499v2.858l-10 4.545-10-4.547V4.499zm0 5.053V19.5c0 .828.671 1.5 1.5 1.5h17c.828 0 1.5-.672 1.5-1.5V9.554l-10 4.545-10-4.547z',
   MESSAGES_INACTIVE_PATH: 'M1.998 5.5c0-1.381 1.119-2.5 2.5-2.5h15c1.381 0 2.5 1.119 2.5 2.5v13c0 1.381-1.119 2.5-2.5 2.5h-15c-1.381 0-2.5-1.119-2.5-2.5v-13zm2.5-.5c-.276 0-.5.224-.5.5v2.764l8 3.638 8-3.636V5.5c0-.276-.224-.5-.5-.5h-15zm15.5 5.463l-8 3.636-8-3.638V18.5c0 .276.224.5.5.5h15c.276 0 .5-.224.5-.5v-8.037z',
+  BLOCK_PATH: 'M12 3.75c-4.55 0-8.25 3.69-8.25 8.25 0 1.92.66 3.68 1.75 5.08L17.09 5.5C15.68 4.4 13.92 3.75 12 3.75zm6.5 3.17L6.92 18.5c1.4 1.1 3.16 1.75 5.08 1.75 4.56 0 8.25-3.69 8.25-8.25 0-1.92-.65-3.68-1.75-5.08zM1.75 12C1.75 6.34 6.34 1.75 12 1.75S22.25 6.34 22.25 12 17.66 22.25 12 22.25 1.75 17.66 1.75 12z',
   MUTE: '<g><path d="M18 6.59V1.2L8.71 7H5.5C4.12 7 3 8.12 3 9.5v5C3 15.88 4.12 17 5.5 17h2.09l-2.3 2.29 1.42 1.42 15.5-15.5-1.42-1.42L18 6.59zm-8 8V8.55l6-3.75v3.79l-6 6zM5 9.5c0-.28.22-.5.5-.5H8v6H5.5c-.28 0-.5-.22-.5-.5v-5zm6.5 9.24l1.45-1.45L16 19.2V14l2 .02v8.78l-6.5-4.06z"></path></g>',
+  // The icon X currently uses in the Mute menu item
+  MUTE_X: '<g><path d="M16 22h-2.35l-.275-.219-3.842-3.073 1.424-1.424L14 19.72v-5.477l2-2V22z"></path><path d="M16 6.586l4.293-4.293 1.414 1.414-18 18-1.414-1.414 2.657-2.658C3.795 17.063 3 15.875 3 14.5v-5C3 7.567 4.567 6 6.5 6h2.148l4.727-3.781.274-.219H16v4.586zM9.625 7.78L9.351 8H6.5C5.672 8 5 8.672 5 9.5v5c0 .828.672 1.5 1.5 1.5h.086L14 8.586V4.28l-4.375 3.5z"></path></g>',
   PROMOTED_PATH: 'M19.498 3h-15c-1.381 0-2.5 1.12-2.5 2.5v13c0 1.38 1.119 2.5 2.5 2.5h15c1.381 0 2.5-1.12 2.5-2.5v-13c0-1.38-1.119-2.5-2.5-2.5zm-3.502 12h-2v-3.59l-5.293 5.3-1.414-1.42L12.581 10H8.996V8h7v7z',
   RETWEET: '<g><path d="M4.5 3.88l4.432 4.14-1.364 1.46L5.5 7.55V16c0 1.1.896 2 2 2H13v2H7.5c-2.209 0-4-1.79-4-4V7.55L1.432 9.48.068 8.02 4.5 3.88zM16.5 6H11V4h5.5c2.209 0 4 1.79 4 4v8.45l2.068-1.93 1.364 1.46-4.432 4.14-4.432-4.14 1.364-1.46 2.068 1.93V8c0-1.1-.896-2-2-2z"></path></g>',
   RETWEETS_OFF: '<g><path d="M3.707 21.707l18-18-1.414-1.414-2.088 2.088C17.688 4.137 17.11 4 16.5 4H11v2h5.5c.028 0 .056 0 .084.002l-10.88 10.88c-.131-.266-.204-.565-.204-.882V7.551l2.068 1.93 1.365-1.462L4.5 3.882.068 8.019l1.365 1.462 2.068-1.93V16c0 .871.278 1.677.751 2.334l-1.959 1.959 1.414 1.414zM18.5 9h2v7.449l2.068-1.93 1.365 1.462-4.433 4.137-4.432-4.137 1.365-1.462 2.067 1.93V9zm-8.964 9l-2 2H13v-2H9.536z"></path></g>',
@@ -2408,6 +2421,12 @@ let quotedTweet = null
 
 /** `true` when a 'Block @${user}' menu item was clicked in the last popup. */
 let blockMenuItemClicked = false
+
+/**
+ * `true` while a one-click button is driving a Tweet's caret menu, so fast
+ * blocking leaves the block confirmation to it.
+ */
+let oneClickActionInProgress = false
 
 /** `true` when a 'Block @${user}' menu item was seen in the last popup. */
 let blockMenuItemSeen = false
@@ -2814,23 +2833,31 @@ function getNotificationCount() {
   return state.badgeCount.unreadDMCount + state.badgeCount.unreadNTabCount;
 }
 
+/**
+ * Headers the web app sends with its own API requests.
+ * @param {string} contentType
+ */
+function getApiHeaders(contentType) {
+  let csrfToken = document.cookie.split('; ').find(c => c.startsWith('ct0='))?.split('=')[1]
+  return {
+    'authorization': 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA',
+    'content-type': contentType,
+    'x-twitter-active-user': 'yes',
+    'x-twitter-auth-type': 'OAuth2Session',
+    'x-twitter-client-language': lang,
+    ...(csrfToken && {'x-csrf-token': csrfToken}),
+  }
+}
+
 let accountLocationCache = new Map()
 
 async function getAccountLocation(screenName) {
   if (!accountLocationCache.has(screenName)) {
-    let csrfToken = document.cookie.split('; ').find(c => c.startsWith('ct0='))?.split('=')[1]
     let response = await fetch(
       `/i/api/graphql/XRqGa7EeokUU5kppkh13EA/AboutAccountQuery?variables=${encodeURIComponent(JSON.stringify({screenName}))}`,
       {
         credentials: 'include',
-        headers: {
-          'authorization': 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA',
-          'content-type': 'application/json',
-          'x-twitter-active-user': 'yes',
-          'x-twitter-auth-type': 'OAuth2Session',
-          'x-twitter-client-language': lang,
-          ...(csrfToken && {'x-csrf-token': csrfToken}),
-        }
+        headers: getApiHeaders('application/json'),
       }
     )
     if (response.ok) {
@@ -3420,6 +3447,37 @@ const observePopups = (() => {
       name: 'popup container',
       observers: globalObservers,
     })
+  }
+})()
+
+const observeOneClickButtons = (() => {
+  let scanScheduled = false
+
+  function scheduleScan() {
+    if (scanScheduled) return
+    scanScheduled = true
+    // Mutations arrive in bursts while timelines render, so scan once a frame
+    requestAnimationFrame(() => {
+      scanScheduled = false
+      addOneClickButtons()
+    })
+  }
+
+  return function observeOneClickButtons() {
+    globalObservers.get('one-click mute/block buttons')?.disconnect()
+    // Rebuilt from scratch so a change to which buttons are shown also applies
+    // to the ones already on the page.
+    document.querySelectorAll('.cpft_one_click').forEach(el => el.remove())
+
+    if (!config.oneClickMuteButton && !config.oneClickBlockButton) return
+
+    // Tweets render in the app, but List members and other user lists open as
+    // modals in #layers, so watch everything under <body>.
+    observeElement($body, scheduleScan, {
+      leading: true,
+      name: 'one-click mute/block buttons',
+      observers: globalObservers,
+    }, {childList: true, subtree: true})
   }
 })()
 
@@ -4072,6 +4130,198 @@ async function addToggleListRetweetsMenuItem($switchMenuItem) {
  * Redirects away from the Home timeline if we're on it and it's been disabled.
  * @returns {boolean} `true` if redirected as a result of this call
  */
+/**
+ * Mute and block state set by one-click buttons in user lists, which X's own
+ * cache doesn't know about, so re-rendered cells don't revert to stale state.
+ * @type {Map<string, {muting?: boolean, blocking?: boolean}>}
+ */
+let oneClickUserState = new Map()
+
+function addOneClickButtons() {
+  /** @type {string} */
+  let ownScreenName
+
+  for (let $tweet of document.querySelectorAll('article[data-testid="tweet"]')) {
+    if ($tweet.querySelector('.cpft_one_click')) continue
+    // The first one is the Tweet's author, not the author of a quoted Tweet
+    let $userName = $tweet.querySelector('[data-testid="User-Name"]')
+    if (!$userName || !$tweet.querySelector('[data-testid="caret"]')) continue
+    let screenName = $userName.querySelector('a[href^="/"]')?.getAttribute('href').slice(1)
+    ownScreenName ??= getUserScreenName()?.toLowerCase() ?? ''
+    // The menu for your own Tweets has no Mute or Block items
+    if (!screenName || screenName.toLowerCase() == ownScreenName) continue
+
+    let $group = createOneClickButtonGroup((action) => createOneClickButton(action, () => {
+      oneClickTweetAction($tweet, action)
+    }))
+    // The focused Tweet stacks the name above the handle
+    let $target = getComputedStyle($userName).flexDirection == 'column' ? $userName.firstElementChild : $userName
+    $target.append($group)
+  }
+
+  for (let $cell of document.querySelectorAll('[data-testid="UserCell"]')) {
+    if ($cell.querySelector('.cpft_one_click') || $cell.closest(Selectors.SIDEBAR)) continue
+    // Your own cell is the only one without a relationship button
+    let $relationshipButton = /** @type {HTMLElement} */ (Array.from($cell.querySelectorAll('button[data-testid]')).find(
+      ($button) => /^\d+-(follow|unfollow|unblock|cancel)$/.test(/** @type {HTMLElement} */ ($button).dataset.testid)
+    ))
+    if (!$relationshipButton) continue
+
+    let userId = $relationshipButton.dataset.testid.split('-')[0]
+    let cachedUser = getStateEntities()?.users?.entities?.[userId]
+    let state = {
+      muting: Boolean(cachedUser?.muting),
+      blocking: Boolean(cachedUser?.blocking),
+      ...oneClickUserState.get(userId),
+    }
+    let $group = createOneClickButtonGroup((action) => {
+      let $button = createOneClickButton(action, () => oneClickUserAction(userId, $button))
+      setOneClickButtonActive($button, action == 'mute' ? state.muting : state.blocking)
+      return $button
+    })
+    $relationshipButton.parentElement.before($group)
+  }
+}
+
+/**
+ * @param {(action: 'mute' | 'block') => HTMLElement} createButton
+ */
+function createOneClickButtonGroup(createButton) {
+  let $group = document.createElement('div')
+  $group.className = 'cpft_one_click'
+  if (config.oneClickMuteButton) $group.append(createButton('mute'))
+  if (config.oneClickBlockButton) $group.append(createButton('block'))
+  return $group
+}
+
+/**
+ * @param {'mute' | 'block'} action
+ * @param {() => void} onActivate
+ */
+function createOneClickButton(action, onActivate) {
+  let $button = document.createElement('div')
+  $button.className = 'cpft_one_click_button'
+  $button.dataset.action = action
+  $button.setAttribute('role', 'button')
+  $button.tabIndex = 0
+  $button.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${
+    action == 'mute' ? Svgs.MUTE_X : `<g><path d="${Svgs.BLOCK_PATH}"></path></g>`
+  }</svg>`
+  setOneClickButtonActive($button, false)
+  let activate = (/** @type {Event} */ e) => {
+    // Both Tweets and user cells navigate when clicked
+    e.preventDefault()
+    e.stopPropagation()
+    onActivate()
+  }
+  $button.addEventListener('click', activate)
+  $button.addEventListener('keydown', (e) => {
+    if (e.key == 'Enter' || e.key == ' ') activate(e)
+  })
+  return $button
+}
+
+/**
+ * @param {HTMLElement} $button
+ * @param {boolean} active
+ */
+function setOneClickButtonActive($button, active) {
+  let label = getString(/** @type {import("./types").LocaleStringKey} */ (
+    `${active ? 'UN' : ''}${$button.dataset.action.toUpperCase()}`
+  ))
+  $button.classList.toggle('cpft_one_click_active', active)
+  $button.title = label
+  $button.setAttribute('aria-label', label)
+}
+
+/**
+ * Drives the Tweet's own menu rather than calling the API, so X hides the
+ * Tweet and shows its usual toast with Undo.
+ * @param {HTMLElement} $tweet
+ * @param {'mute' | 'block'} action
+ */
+async function oneClickTweetAction($tweet, action) {
+  if (oneClickActionInProgress) return
+
+  let $caret = /** @type {HTMLElement} */ ($tweet.querySelector('[data-testid="caret"]'))
+  if (!$caret) {
+    warn(`oneClick: no caret menu to ${action} from`)
+    return
+  }
+
+  log(`oneClick: ${action} from Tweet`)
+  oneClickActionInProgress = true
+  $body.classList.add('OneClickAction')
+  try {
+    $caret.click()
+    let $menuItem = await getElement(action == 'mute' ? Selectors.MUTE_MENU_ITEM : Selectors.BLOCK_MENU_ITEM, {
+      name: `${action} menu item`,
+      timeout: 1000,
+    })
+    if (!$menuItem) {
+      // e.g. the account is already muted, so the menu has Unmute instead
+      let $menu = document.querySelector('#layers [role="group"]:has(:is([data-testid="Dropdown"], [data-testid="sheetDialog"]))')
+      ;/** @type {HTMLElement} */ ($menu?.firstElementChild?.firstElementChild)?.click()
+      return
+    }
+    $menuItem.click()
+    if (action == 'block') {
+      let $confirm = await getElement('[data-testid="confirmationSheetConfirm"]', {
+        name: 'block confirmation button',
+        timeout: 1000,
+      })
+      $confirm?.click()
+    }
+  } finally {
+    oneClickActionInProgress = false
+    $body.classList.remove('OneClickAction')
+  }
+}
+
+/**
+ * User cells have no menu to drive, so these use the API directly and become
+ * toggles for undoing.
+ * @param {string} userId
+ * @param {HTMLElement} $button
+ */
+async function oneClickUserAction(userId, $button) {
+  if ($button.hasAttribute('aria-busy')) return
+
+  let action = /** @type {'mute' | 'block'} */ ($button.dataset.action)
+  let undo = $button.classList.contains('cpft_one_click_active')
+  let endpoint = {
+    mute: undo ? 'mutes/users/destroy' : 'mutes/users/create',
+    block: undo ? 'blocks/destroy' : 'blocks/create',
+  }[action]
+
+  log(`oneClick: ${endpoint}`, userId)
+  $button.setAttribute('aria-busy', 'true')
+  try {
+    let response = await fetch(`/i/api/1.1/${endpoint}.json`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: getApiHeaders('application/x-www-form-urlencoded'),
+      body: new URLSearchParams({user_id: userId}),
+    })
+    if (!response.ok) {
+      error(response.status, `response from ${endpoint} for`, userId)
+      return
+    }
+    oneClickUserState.set(userId, {
+      ...oneClickUserState.get(userId),
+      [action == 'mute' ? 'muting' : 'blocking']: !undo,
+    })
+    // The same user can appear in more than one cell
+    for (let $other of document.querySelectorAll(`[data-testid="UserCell"]:has(button[data-testid^="${userId}-"]) .cpft_one_click_button[data-action="${action}"]`)) {
+      setOneClickButtonActive(/** @type {HTMLElement} */ ($other), !undo)
+    }
+  } catch (e) {
+    error(`error calling ${endpoint} for`, userId, e)
+  } finally {
+    $button.removeAttribute('aria-busy')
+  }
+}
+
 function checkforDisabledHomeTimeline() {
   if (config.disableHomeTimeline && location.pathname == PagePaths.HOME) {
     log(`Home timeline disabled, redirecting to /${config.disabledHomeTimelineRedirect}`)
@@ -4193,6 +4443,53 @@ const configureCss = (() => {
       `[data-testid="trend"]:has(path[d="${Svgs.PROMOTED_PATH}"])`,
     ]
     let menuRole = `[role="${desktop ? 'menu' : 'dialog'}"]`
+
+    if (config.oneClickMuteButton || config.oneClickBlockButton) {
+      cssRules.push(`
+        .cpft_one_click {
+          display: flex;
+          align-items: center;
+          gap: 2px;
+          flex-shrink: 0;
+          margin-inline-start: 4px;
+        }
+        [data-testid="UserCell"] .cpft_one_click {
+          /* Pushes it up against the Follow button in the space-between row */
+          margin-inline: auto 8px;
+        }
+        .cpft_one_click_button {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 28px;
+          height: 28px;
+          border-radius: 9999px;
+          color: var(--cpft-text-secondary);
+          cursor: pointer;
+          transition: background-color 0.2s, color 0.2s;
+        }
+        .cpft_one_click_button svg {
+          width: 18px;
+          height: 18px;
+          fill: currentColor;
+        }
+        .cpft_one_click_button:is(:hover, :focus-visible, .cpft_one_click_active) {
+          background-color: rgba(244, 33, 46, 0.1);
+          color: rgb(244, 33, 46);
+        }
+        .cpft_one_click_button:focus-visible {
+          outline: 2px solid rgb(244, 33, 46);
+        }
+        .cpft_one_click_button[aria-busy] {
+          opacity: 0.5;
+          cursor: progress;
+        }
+        /* The caret menu and block confirmation are only driven programmatically */
+        body.OneClickAction #layers [role="group"]:has(:is([data-testid="Dropdown"], [data-testid="sheetDialog"], [data-testid="confirmationSheetDialog"])) {
+          opacity: 0;
+        }
+      `)
+    }
 
     // Theme colours for custom UI items
     cssRules.push(`
@@ -4447,6 +4744,12 @@ const configureCss = (() => {
     }
     if (config.hideCommunitiesNav) {
       hideCssSelectors.push(`${menuRole} a[href$="/communities"]`)
+    }
+    if (config.hideCallsNav) {
+      hideCssSelectors.push(
+        // Desktop and mobile nav, and the More menu
+        `:is(nav, ${menuRole}) a[href$="/i/calls"]`,
+      )
     }
     if (config.hideChatNav) {
       hideCssSelectors.push(
@@ -5837,7 +6140,7 @@ function handlePopup($popup) {
       blockMenuItemClicked = false
       result.tookAction = true
     }
-    else if ($popup.querySelector(Selectors.BLOCK_MENU_ITEM)) {
+    else if (!oneClickActionInProgress && $popup.querySelector(Selectors.BLOCK_MENU_ITEM)) {
       log('fastBlock: preparing for fast blocking')
       blockMenuItemSeen = true
       blockMenuItemClicked = false
@@ -8047,6 +8350,7 @@ async function main() {
       configureCustomCss()
       observePopups()
       observeSideNavItems()
+      observeOneClickButtons()
 
       // Start taking action on page changes
       observingPageChanges = true
@@ -8097,7 +8401,7 @@ function configChanged(changes) {
       // Manually remove custom UI elements which clone existing elements, as
       // adding a hidden attribute won't hide them by default.
       document.querySelector('#cpftSeparatedTweetsTab')?.remove()
-      document.querySelectorAll('.cpft_menu_item').forEach(el => el.remove())
+      document.querySelectorAll('.cpft_menu_item, .cpft_one_click').forEach(el => el.remove())
       disconnectObservers(modalObservers, 'modal')
       disconnectObservers(pageObservers, 'page')
       disconnectObservers(globalObservers, 'global')
@@ -8117,6 +8421,9 @@ function configChanged(changes) {
   configureCustomCss()
   observePopups()
   observeSideNavItems()
+  if ('oneClickMuteButton' in changes || 'oneClickBlockButton' in changes) {
+    observeOneClickButtons()
+  }
 
   if ('darkModeTheme' in changes) {
     observeThemeMeta.update()

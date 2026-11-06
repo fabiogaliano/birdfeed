@@ -44,6 +44,8 @@ const DESCRIPTIONS = {
   hideComposeTweet: 'Removes the floating "Post" button. You can still post from the box at the top of the timeline.',
   disabledHomeTimelineRedirect: 'Which page opens instead of the home timeline.',
   fastBlock: 'Blocks immediately when you pick Block, with no confirmation dialog. There is no undo step.',
+  oneClickMuteButton: "Adds a Mute button next to the author's name on tweets and next to Follow in user lists like List members. Click it again in a user list to unmute.",
+  oneClickBlockButton: "Adds a Block button next to the author's name on tweets and next to Follow in user lists like List members. On tweets it blocks without a confirmation step; click it again in a user list to unblock.",
   hideUnavailableQuoteTweets: 'Removes posts whose quoted post is from an account you blocked or muted, instead of showing an empty placeholder.',
   hideProfileRetweets: 'Shows only a profile\'s own posts on its timeline, not what it retweeted.',
 
@@ -113,6 +115,7 @@ const DESCRIPTIONS = {
   hideExploreNavWithSidebar: 'Brings Explore back when the sidebar is hidden, since search lives there otherwise.',
   hideMessagesBottomNavItem: 'Removes Messages from the navigation.',
   hideChatNav: 'Removes Chat from the navigation.',
+  hideCallsNav: 'Removes Calls from the navigation.',
   hideAdsNav: 'Removes Ads from the navigation. Only appears on accounts that have it.',
   hideSpacesNav: 'Removes Spaces from the navigation.',
 

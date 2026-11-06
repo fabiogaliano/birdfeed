@@ -209,6 +209,12 @@
   "hideBusinessNavLabel": {
     "message": "Business"
   },
+  "hideCallsNavInfo": {
+    "message": "Removes Calls from the navigation."
+  },
+  "hideCallsNavLabel": {
+    "message": "Calls"
+  },
   "hideChatNavInfo": {
     "message": "Removes Chat from the navigation."
   },
@@ -568,6 +574,21 @@
   },
   "notificationsLabel": {
     "message": "Notifications"
+  },
+  "oneClickBlockButtonInfo": {
+    "message": "Adds a Block button next to the author's name on tweets and next to Follow in user lists like List members. On tweets it blocks without a confirmation step; click it again in a user list to unblock."
+  },
+  "oneClickBlockButtonLabel": {
+    "message": "Show Block button"
+  },
+  "oneClickButtonsOptionsLabel": {
+    "message": "One-click mute and block"
+  },
+  "oneClickMuteButtonInfo": {
+    "message": "Adds a Mute button next to the author's name on tweets and next to Follow in user lists like List members. Click it again in a user list to unmute."
+  },
+  "oneClickMuteButtonLabel": {
+    "message": "Show Mute button"
   },
   "option_badges": {
     "message": "Hide badges only"
