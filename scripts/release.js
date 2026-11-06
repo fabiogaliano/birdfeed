@@ -3,6 +3,8 @@ const {execSync, execFileSync} = require('child_process')
 
 const semver = require('semver')
 
+const {CHANGELOG_PATH, stampRelease} = require('./changelog')
+
 const manifestPaths = ['./manifest.mv2.json', './manifest.mv3.json', './safari/Shared (Extension)/Resources/manifest.json']
 const safariProjectPath = './safari/Birdfeed.xcodeproj/project.pbxproj'
 
@@ -18,6 +20,9 @@ Usage:
 
 let currentVersion = JSON.parse(fs.readFileSync(manifestPaths[0], {encoding: 'utf8'})).version
 let nextVersion = semver.inc(currentVersion, releaseType)
+
+// First, so a release with no changelog entry stops before anything is touched
+stampRelease(nextVersion)
 
 for (let manifestPath of manifestPaths) {
   fs.writeFileSync(
@@ -44,10 +49,11 @@ execFileSync('git', [
   'add',
   ...manifestPaths,
   safariProjectPath,
+  CHANGELOG_PATH,
 ], {stdio: 'inherit'})
 execSync(`git commit -m "Release v${nextVersion}"`, {stdio: 'inherit'})
 execSync(`git tag v${nextVersion}`, {stdio: 'inherit'})
 execSync('git push', {stdio: 'inherit'})
 execSync(`git push origin v${nextVersion}`, {stdio: 'inherit'})
 
-console.log(`\nTagged and pushed v${nextVersion} — GitHub Actions will build the release.`)
+console.log(`\nTagged and pushed v${nextVersion} — GitHub Actions will build the release and submit it to the Chrome Web Store.`)

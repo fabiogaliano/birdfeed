@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      # Lets google-github-actions/auth exchange GitHub's OIDC token for the
+      # Chrome Web Store publisher service account, so no key is stored here.
+      id-token: write
     steps:
       - uses: actions/checkout@v6
 
@@ -27,8 +30,27 @@ jobs:
       - name: Build extensions
         run: pnpm run build
 
+      - name: Release notes from CHANGELOG.md
+        run: node scripts/changelog.js notes "${GITHUB_REF_NAME}" > release-notes.md
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
-          generate_release_notes: true
+          body_path: release-notes.md
           files: web-ext-artifacts/*.zip
+
+      - name: Authenticate as the Chrome Web Store publisher
+        id: google
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.CWS_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.CWS_SERVICE_ACCOUNT }}
+          token_format: access_token
+          access_token_scopes: https://www.googleapis.com/auth/chromewebstore
+
+      - name: Submit to the Chrome Web Store
+        env:
+          CWS_ACCESS_TOKEN: ${{ steps.google.outputs.access_token }}
+          CWS_PUBLISHER_ID: ${{ vars.CWS_PUBLISHER_ID }}
+          CWS_EXTENSION_ID: ${{ vars.CWS_EXTENSION_ID }}
+        run: node scripts/publish-chrome.js "web-ext-artifacts/birdfeed-${GITHUB_REF_NAME#v}.mv3.zip"
