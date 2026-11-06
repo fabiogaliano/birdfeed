@@ -6,6 +6,8 @@ as the GitHub release notes.
 
 ## Unreleased
 
+## 4.25.0 - 2026-11-06
+
 ### Added
 
 - One-click **Mute** and **Block** buttons. On tweets they sit next to the author's name
