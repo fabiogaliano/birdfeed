@@ -6,6 +6,8 @@ as the GitHub release notes.
 
 ## Unreleased
 
+## 4.26.0 - 2026-11-24
+
 ### Changed
 
 - Rebuilt for X's new web client. X replaced its whole web app, and Birdfeed stopped
