@@ -2,7 +2,7 @@
  * Splits the map's "probed, moved nothing" settings into broken vs blocked.
  *
  * The probe run can only say a setting changed nothing. It cannot say why, so
- * `hideJobsNav` (this account has no Jobs nav) and a setting X genuinely broke
+ * `hideAdsNav` (this account has no Ads item) and a setting X genuinely broke
  * land in the same bucket. That bucket is the one thing the map could never
  * answer, and it is the whole question: is this outdated, or just untested?
  *
@@ -22,46 +22,23 @@
 const fs = require('fs')
 const path = require('path')
 
-const {ROOT} = require('./lib/default-config')
+const {ROOT, readDefaultConfig} = require('./lib/default-config')
 const {launch, openX} = require('./lib/browser')
 const {ready, resolveContext, buildSurfaces} = require('./lib/surfaces')
 const {STATES, closeOverlays} = require('./lib/states')
 const {readFunctions, blocksFor, deriveTargets, routeFor} = require('./lib/routing')
+const {readSource, readConstants, withConstants, iconNames, iconSelector, attrHooks} = require('./lib/extract')
 
 const MAP_JSON = path.join(ROOT, 'audit-results', 'settings-map.json')
 const OUT_JSON = path.join(ROOT, 'audit-results', 'hooks.json')
 const OUT_MD = path.join(ROOT, 'audit-results', 'hooks.md')
 
-// Paths the extension *writes*, not ones it looks for. They correctly match
-// nothing on live X until the setting that injects them is on, so counting them
-// as breakage is how the messages icon got misfiled as broken once already.
-const INJECTED = /^(TWITTER_|BLUE_LOGO|MESSAGES_(ACTIVE|INACTIVE))/
-
 // Tighter than routing's 800: a selector dragged in from the next function makes
 // a dead setting look alive, which is the one verdict this must not get wrong.
 const HOOK_BLOCK = 240
 
-function readSource() {
-  return fs.readFileSync(path.join(ROOT, 'script.js'), 'utf8')
-}
-
-// The Selectors and Svgs tables, so a `Selectors.FOO` reference inside a block
-// can be resolved to the string it actually stands for.
-function readTables() {
-  let source = readSource()
-  let table = (start, pattern) => {
-    let body = source.slice(source.indexOf(start))
-    body = body.slice(0, body.indexOf('\n}'))
-    return new Map([...body.matchAll(pattern)].map(m => [m[1], m[2]]))
-  }
-  return {
-    selectors: table('const Selectors = {', /^\s*([A-Z_0-9]+):\s*'([^']+)'/gm),
-    svgs: table('const Svgs = {', /^\s*([A-Z_0-9]+):\s*'(M[^']+)'/gm),
-  }
-}
-
 // Everything in a block that could be a hook into X's DOM.
-function hooksIn(block, tables) {
+function hooksIn(block, constants) {
   let found = new Map()
   let add = (name, selector, kind) => {
     // `${` means a template literal was frozen mid-interpolation - that string
@@ -70,27 +47,27 @@ function hooksIn(block, tables) {
     found.set(name, {name, selector, kind})
   }
 
-  for (let m of block.matchAll(/Selectors\.([A-Z_0-9]+)/g)) {
-    add(m[1], tables.selectors.get(m[1]), 'named')
+  // A block that names TIMELINE_ROW or POST_MENU_TRIGGER depends on their hooks
+  // as much as on its own.
+  let text = withConstants(block, constants)
+
+  // Icon names, which X renames the way it used to redraw SVG paths.
+  for (let icon of iconNames(text)) {
+    add(`icon:${icon.name}${icon.prefix ? '*' : ''}`, iconSelector(icon), 'icon')
   }
-  for (let m of block.matchAll(/Svgs\.([A-Z_0-9]+)/g)) {
-    if (INJECTED.test(m[1])) continue
-    let d = tables.svgs.get(m[1])
-    add(m[1], d && `svg path[d="${d}"]`, 'svgPath')
-  }
-  // Inline testids, including the ones written straight into CSS strings.
-  for (let m of block.matchAll(/data-testid\^?\$?=\\?["']([^"'\\]+)\\?["']/g)) {
-    add(`testid:${m[1]}`, `[data-testid="${m[1]}"]`, 'testid')
-  }
+  // X's semantic attributes - data-engagement-action, data-slot, urt: ids -
+  // which stand in for the data-testids the old client had.
+  for (let hook of attrHooks(text)) add(`attr:${hook.name}`, hook.selector, 'attr')
   // href hooks - how several settings identify their subject. Suffix and
-  // substring forms matter as much as prefix: hideChatNav's only real hook is
-  // a[href$="/i/chat"], and reading just `^=` missed it entirely.
-  for (let m of block.matchAll(/href([\^$*]?)=\\?["']([^"'\\]+)\\?["']/g)) {
+  // substring forms matter as much as prefix: hideCreatorStudioNav's only real
+  // hook is a[href$="/creators/studio"], and reading just `^=` misses it.
+  // `#…` hrefs are sprite icons, already counted above.
+  for (let m of text.matchAll(/href([\^$*]?)=\\?["']([^"'\\#][^"'\\]*)\\?["']/g)) {
     if (m[2].includes('${')) continue
     add(`href${m[1]}:${m[2]}`, `a[href${m[1]}="${m[2]}"]`, 'href')
   }
   // Bare aria/role hooks the extension leans on for menus.
-  for (let m of block.matchAll(/\[(?:role|aria-label)=\\?["']([^"'\\]+)\\?["']\]/g)) {
+  for (let m of text.matchAll(/\[(?:role|aria-label)=\\?["']([^"'\\]+)\\?["']\]/g)) {
     add(`role:${m[1]}`, `[role="${m[1]}"]`, 'role')
   }
 
@@ -105,35 +82,36 @@ function hooksIn(block, tables) {
   // Content (a link inside a post, a specific post type) is absent whenever
   // that content isn't on screen, which is indistinguishable from breakage -
   // exactly the ambiguity this tool exists to remove, so it must not pretend
-  // to have resolved it.
-  let inNav = /menuRole|PRIMARY_NAV|MORE_DIALOG|header nav|\[role="menu"\]|SIDEBAR/.test(block)
+  // to have resolved it. configureCss's nav scopes are the `rail`, `anyNav`
+  // and `menus` variables, so their names mark a nav block.
+  let inNav = /\bnav\b|\$\{(?:rail|anyNav|menus)\}|\[role="menu"\]|\baside\b|xds-dock/.test(block)
   for (let h of hooks) {
-    h.family = h.kind == 'href' || h.kind == 'svgPath'
+    h.family = h.kind == 'href' || h.kind == 'icon'
       ? (inNav ? 'chrome' : 'content')
       : 'chrome'
   }
   return hooks
 }
 
-// Six settings classify an item by comparing an SVG path *prefix* in JS rather
-// than querying the DOM. No selector exists to count, so this method is blind
-// to them by construction - icon-paths.js is the tool that covers these.
+// Notification settings classify an item by comparing a Relay value -
+// `content.icon == 'heart_icon'` - rather than querying the DOM. No selector
+// exists to count, so this method is blind to them by construction -
+// icon-paths.js reads those values from the Relay store instead.
 //
-// Scanned around the reference rather than in the forward block: these read
-// `if ($iconPath.startsWith(...)) { hideItem = config.x }`, so the tell sits on
-// the line *before* the config mention and a forward-only window misses it.
-function usesIconPath(source, key) {
+// Scanned around the reference rather than in the forward block, so it
+// doesn't depend on which side of the comparison the config mention is on.
+function usesIconValue(source, key) {
   let pattern = new RegExp(`config\\.${key}\\b`, 'g')
   for (let m of source.matchAll(pattern)) {
-    let around = source.slice(Math.max(0, m.index - 400), m.index + 200)
-    if (/\$iconPath\.startsWith|iconPath\s*==/.test(around)) return true
+    let around = source.slice(Math.max(0, m.index - 200), m.index + 200)
+    if (/\.icon\s*==/.test(around)) return true
   }
   return false
 }
 
 // A hook shared by many of the unresolved settings is structural, not
-// diagnostic: [data-testid="tweet"] and [role="group"] are on every page, so
-// letting them count would mark every setting alive regardless of breakage.
+// diagnostic: [id^="urt:"] and [role="group"] are on every page, so letting
+// them count would mark every setting alive regardless of breakage.
 // Measured rather than hand-listed, so it stays right as the code moves.
 const SHARED_FRACTION = 0.25
 
@@ -153,12 +131,15 @@ function markGeneric(settings) {
 
 function collect() {
   let map = JSON.parse(fs.readFileSync(MAP_JSON, 'utf8'))
+  // A map recorded before a setting was retired still lists it, and with no
+  // code left it would read as unjudgeable rather than gone.
+  let current = readDefaultConfig()
   let unresolved = map.unconfirmed
-    .filter(u => u.hasRoutingEvidence && !u.subThreshold)
+    .filter(u => u.hasRoutingEvidence && !u.subThreshold && u.key in current)
     .map(u => u.key)
 
-  let tables = readTables()
   let source = readSource()
+  let constants = readConstants(source)
   let blocks = new Map()
   for (let fn of readFunctions()) {
     for (let [key, block] of blocksFor(fn.body, HOOK_BLOCK)) {
@@ -171,8 +152,8 @@ function collect() {
     let block = blocks.get(key) || ''
     return {
       key,
-      hooks: hooksIn(block, tables),
-      iconPath: usesIconPath(source, key),
+      hooks: hooksIn(block, constants),
+      iconValue: usesIconValue(source, key),
       routes: routeFor(key, targets),
     }
   }))
@@ -259,7 +240,7 @@ async function run() {
   let rows = settings.map(s => {
     let hooks = s.hooks.map(h => ({...h, count: total(h.selector), where: where(h.selector)}))
     // Only distinctive hooks decide the verdict. A setting whose sole surviving
-    // hook is [data-testid="tweet"] has told us nothing about itself.
+    // hook is [id^="urt:"] has told us nothing about itself.
     let telling = hooks.filter(h => !h.generic)
     let live = telling.filter(h => h.count > 0)
 
@@ -267,7 +248,7 @@ async function run() {
     // hook that matched nothing. All-content zeros stay unresolved rather than
     // being upgraded into a breakage claim the evidence doesn't support.
     let verdict =
-      s.iconPath ? 'icon-path' :
+      s.iconValue ? 'icon-value' :
       !telling.length ? 'no-hooks' :
       live.length ? 'alive' :
       telling.some(h => h.family == 'chrome') ? 'dead' : 'content-absent'
@@ -287,7 +268,7 @@ async function run() {
     `| Dead — a chrome hook matches nothing | ${of('dead').length} |`,
     `| Alive — hooks match, so blocked on content | ${of('alive').length} |`,
     `| Content absent — cannot tell broken from untested | ${of('content-absent').length} |`,
-    `| Icon-path match — see icon-paths.js | ${of('icon-path').length} |`,
+    `| Relay icon value — see icon-paths.js | ${of('icon-value').length} |`,
     `| No DOM hook to check | ${of('no-hooks').length} |`, '']
 
   md.push('## Dead — every hook matches nothing', '',
@@ -319,17 +300,18 @@ async function run() {
     }
   }
 
-  if (of('icon-path').length) {
-    md.push('', '## Matched by icon geometry — not visible to this method', '',
-      'These classify an item by comparing an SVG path prefix in JavaScript, so',
-      'there is no selector to count. `scripts/audit/icon-paths.js` covers them.', '',
-      ...of('icon-path').map(r => `- \`${r.key}\``))
+  if (of('icon-value').length) {
+    md.push('', '## Matched by a Relay icon value — not visible to this method', '',
+      'These classify a notification by its `icon` value in Relay, so there is',
+      'no selector to count. `scripts/audit/icon-paths.js` covers them.', '',
+      ...of('icon-value').map(r => `- \`${r.key}\``))
   }
 
   if (of('no-hooks').length) {
     md.push('', '## No DOM hook to check', '',
-      'Nothing in these blocks queries the page, so this method cannot judge',
-      'them either way - they need behavioural tests.', '',
+      'Nothing in these blocks queries the page - most act on GraphQL responses',
+      'or Relay records - so this method cannot judge them either way. They',
+      'need behavioural tests.', '',
       ...of('no-hooks').map(r => `- \`${r.key}\``))
   }
 
@@ -338,7 +320,7 @@ async function run() {
   console.log(`\n  dead:            ${of('dead').length}`)
   console.log(`  alive:           ${of('alive').length}`)
   console.log(`  content-absent:  ${of('content-absent').length}`)
-  console.log(`  icon-path:       ${of('icon-path').length}`)
+  console.log(`  icon-value:      ${of('icon-value').length}`)
   console.log(`  no-hooks:        ${of('no-hooks').length}`)
   console.log(`\n  ${path.relative(ROOT, OUT_MD)}`)
 }

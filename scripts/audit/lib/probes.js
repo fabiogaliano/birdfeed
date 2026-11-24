@@ -3,7 +3,6 @@ const {readDefaultConfig, UNPROBEABLE} = require('./default-config')
 // Enum settings need explicit endpoints. The `from` value is the inert one where
 // there is one, so the probe measures the setting doing its thing.
 const ENUMS = {
-  darkModeTheme: ['lightsOut', 'dim'],
   disabledHomeTimelineRedirect: ['notifications', 'messages'],
   followButtonStyle: ['themed', 'monochrome'],
   hideNotifications: ['ignore', 'hide'],

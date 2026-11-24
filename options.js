@@ -16,10 +16,8 @@ for (let optionValue of [
   'comfortable',
   'compact',
   'default',
-  'dim',
   'hide',
   'ignore',
-  'lightsOut',
   'liked',
   'mostRecent',
   'popular',
@@ -41,7 +39,6 @@ for (let translationId of [
   'alwaysUseLatestTweetsLabel',
   'bypassAgeVerificationLabel',
   'customCssLabel',
-  'darkModeThemeLabel',
   'debugInfo',
   'debugLabel',
   'debugLogTimelineStatsLabel',
@@ -90,7 +87,6 @@ for (let translationId of [
   'hideGrokLabel',
   'hideGrokTweetsLabel',
   'hideInlinePrompts',
-  'hideJobsLabel',
   'hideLikeMetricsLabel',
   'hideLiveBroadcastBarLabel',
   'hideLiveBroadcastsLabel',
@@ -137,11 +133,8 @@ for (let translationId of [
   'reducedInteractionModeInfo',
   'reducedInteractionModeLabel',
   'replaceLogoLabel',
-  'restoreLinkHeadlinesLabel',
   'restoreOtherInteractionLinksLabel',
-  'restoreQuoteTweetsLinkLabel',
   'restorePhotoGridLabel',
-  'restoreTweetSourceLabel',
   'retweetsLabel',
   'showBlueReplyFollowersCountAmountLabel',
   'showBookmarkButtonUnderFocusedTweetsLabel',
@@ -180,7 +173,6 @@ for (let translationClass of [
   'hideBookmarksNavLabel',
   'hideBusinessNavLabel',
   'hideCommunitiesNavLabel',
-  'hideConnectNavLabel',
   'hideCreatorStudioNavLabel',
   'hideListsNavLabel',
   'notificationsLabel',
@@ -343,7 +335,6 @@ const defaultConfig = {
   addFocusedTweetAccountLocation: false,
   alwaysUseLatestTweets: true,
   bypassAgeVerification: true,
-  darkModeTheme: 'lightsOut',
   defaultToLatestSearch: false,
   disableHomeTimeline: false,
   disabledHomeTimelineRedirect: 'notifications',
@@ -361,7 +352,6 @@ const defaultConfig = {
   hideChatNav: false,
   hideCommunitiesNav: false,
   hideComposeTweet: false,
-  hideConnectNav: true,
   hideCreatorStudioNav: true,
   hideEditImage: true,
   hideExplorePageContents: true,
@@ -370,7 +360,6 @@ const defaultConfig = {
   hideGrokNav: true,
   hideGrokTweets: false,
   hideInlinePrompts: true,
-  hideJobsNav: true,
   hideLikeMetrics: true,
   hideListsNav: false,
   hideMetrics: false,
@@ -405,11 +394,8 @@ const defaultConfig = {
   reducedInteractionMode: false,
   unwrapTcoLinks: false,
   replaceLogo: true,
-  restoreLinkHeadlines: true,
   restoreOtherInteractionLinks: true,
-  restoreQuoteTweetsLink: true,
   restorePhotoGrid: true,
-  restoreTweetSource: true,
   retweets: 'separate',
   showBlueReplyFollowersCount: false,
   showBlueReplyFollowersCountAmount: '1000000',
@@ -505,7 +491,8 @@ function exportConfig() {
 // reports a skipped entry and reads like something went wrong.
 //   version  file metadata
 //   debug    a diagnostic toggle; importing someone else's would fill the console
-const IMPORT_METADATA = new Set(['version', 'debug'])
+//   ''       junk the options search box wrote into storage, so older exports carry it
+const IMPORT_METADATA = new Set(['version', 'debug', ''])
 
 // Settings that existed once and no longer do. Kept as an explicit list rather
 // than inferred from defaultConfig: "not a default" is also true of a key from
@@ -516,12 +503,21 @@ const IMPORT_METADATA = new Set(['version', 'debug'])
 // export taken before the upgrade still carries them, and no amount of pruning
 // reaches a file already on disk.
 //   4.24.0  the Redirects & layout group
+//   4.26.0  things X's rewritten web client dropped or brought back natively
 const RETIRED_CONFIG_KEYS = [
   'redirectToTwitter',
   'redirectChatNav',
   'redirectTwitterLinks',
   'tweakNewLayout',
   'hideToggleNavigation',
+  // Jobs and Connect left the nav, Dim left the themes, the client no longer
+  // receives a post's source, and link headlines and View quotes are native
+  'hideJobsNav',
+  'hideConnectNav',
+  'darkModeTheme',
+  'restoreTweetSource',
+  'restoreLinkHeadlines',
+  'restoreQuoteTweetsLink',
 ]
 
 const IMPORT_SHAPES = {
@@ -718,6 +714,9 @@ function applyConfig() {
  */
 function onFormChanged(e) {
   if (e.target instanceof HTMLTextAreaElement) return
+  // Unnamed controls (the options search box, the import file picker) are UI,
+  // not settings - storing them wrote a junk "" key into storage and exports.
+  if (!(/** @type {HTMLInputElement} */ (e.target).name)) return
 
   /** @type {Partial<import("./types").Config>} */
   let changedConfig = {}
@@ -1056,7 +1055,8 @@ function main() {
     // Drop settings that no longer exist. Nothing reads them, but they are
     // spread into optionsConfig below and so ride along into every export,
     // where the next import has to explain them away.
-    let stale = RETIRED_CONFIG_KEYS.filter(key => key in storedConfig)
+    // '' was written by unnamed controls before onFormChanged ignored them.
+    let stale = [...RETIRED_CONFIG_KEYS, ''].filter(key => key in storedConfig)
     if (stale.length) {
       for (let key of stale) delete storedConfig[key]
       chrome.storage.local.remove(stale)

@@ -16,10 +16,10 @@ window.__birdfeedAudit = {
   beforeSet: null,
   beforeCss: [],
 
-  // Visibility diffing is blind to settings that only restyle: replaceLogo
-  // swaps the logo with a CSS d:path() override, so the element stays put and
-  // the DOM attribute is unchanged while the rendered shape is different. These
-  // properties are the ones the appearance settings actually touch.
+  // Visibility diffing is blind to settings that only restyle: replaceLogo and
+  // twitterBlueChecks:'replace' paint a background image onto X's own svg, so
+  // the element stays put and its DOM is unchanged while what it shows is
+  // different. These properties are the ones the appearance settings touch.
   //
   // The layout properties are here because a setting can relayout without
   // showing or hiding anything: restorePhotoGrid turns a flex carousel into a
@@ -35,7 +35,8 @@ window.__birdfeedAudit = {
   styleSignature(style) {
     return style.color + '|' + style.backgroundColor + '|' + style.fontFamily +
            '|' + style.fontWeight + '|' + style.fontSize + '|' + style.fill +
-           '|' + style.d + '|' + style.borderRadius + '|' + style.padding +
+           '|' + style.d + '|' + style.backgroundImage +
+           '|' + style.borderRadius + '|' + style.padding +
            '|' + style.flexDirection + '|' + style.filter +
            '|' + style.display + '|' + style.gridTemplateColumns +
            '|' + style.aspectRatio + '|' + style.objectFit
@@ -53,13 +54,18 @@ window.__birdfeedAudit = {
             x: Math.round(rect.x), y: Math.round(rect.y), s: this.styleSignature(style)}
   },
 
+  // The first stable hook an element carries, so a sample reads as something
+  // recognisable - X's ids and classes are generated and say nothing.
+  hooks: ['data-icon', 'data-engagement-action', 'data-slot', 'data-pinned-timeline', 'data-testid'],
+
   describe(el) {
-    let testid = el.getAttribute('data-testid')
+    let hook = this.hooks.find(name => el.hasAttribute(name))
     let label = el.getAttribute('aria-label')
     let text = (el.textContent || '').trim().replace(/\\s+/g, ' ').slice(0, 60)
     return [
       el.tagName.toLowerCase(),
-      testid ? '[data-testid="' + testid + '"]' : '',
+      /^urt:/.test(el.id) ? '#' + el.id : '',
+      hook ? '[' + hook + '="' + el.getAttribute(hook) + '"]' : '',
       label ? '[aria-label="' + label.slice(0, 40) + '"]' : '',
       text ? ' :: ' + text : '',
     ].join('')
@@ -156,7 +162,7 @@ window.__birdfeedAudit = {
       boxes,
       viewport: {w: window.innerWidth, h: window.innerHeight},
       column: (() => {
-        let el = document.querySelector('[data-testid="primaryColumn"]')
+        let el = document.querySelector('main')
         if (!el) return null
         let r = el.getBoundingClientRect()
         return {x: Math.round(r.x), w: Math.round(r.width)}
@@ -216,10 +222,11 @@ async function waitForQuiet(page, {stableMs = 600, timeoutMs = 6_000} = {}) {
   return false
 }
 
-// The extension's own stylesheet, as a proxy for "did the config write land".
+// The extension's own stylesheets, as a proxy for "did the config write land".
 // Its internal config object lives in a closure and can't be read directly.
-const OWN_CSS = `(() => [...document.querySelectorAll('style')]
-  .filter(s => /HiddenTweet|cpft_|SidebarContents|HiddenAd/.test(s.textContent || ''))
+// content.js's early cpftLoading logo swap is excluded: script.js removes it on
+// boot, and it says nothing about the config.
+const OWN_CSS = `(() => [...document.querySelectorAll('style[id^="cpft"]:not(#cpftLoading)')]
   .map(s => s.textContent).join('\\n')
 )()`
 

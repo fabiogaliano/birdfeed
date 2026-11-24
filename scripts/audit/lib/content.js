@@ -10,13 +10,12 @@
 // extra named surface, so probes for these settings get their own route.
 const CONTENT_SURFACES = {
   restorePhotoGrid: {name: 'photos', url: 'https://x.com/search?q=filter%3Aimages%20photos&f=top'},
-  restoreLinkHeadlines: {name: 'links', url: 'https://x.com/search?q=filter%3Alinks%20news&f=top'},
   unwrapTcoLinks: {name: 'links', url: 'https://x.com/search?q=filter%3Alinks%20news&f=top'},
   hideGrokNav: {name: 'grok', url: 'https://x.com/search?q=grok&f=top'},
   // hideGrokTweets deliberately has no entry. It matches posts *sharing a Grok
-  // conversation* (a[href^="/i/grok/share/"]), not posts mentioning Grok, and
-  // X search cannot select for that link - a "grok" search returns posts about
-  // Grok, which the setting correctly ignores. It needs a seeded post rather
+  // conversation* (an x.com/i/grok/share/ URL in the post's entities), not
+  // posts mentioning Grok, and X search cannot select for that link - a "grok"
+  // search returns posts about Grok, which the setting correctly ignores. It needs a seeded post rather
   // than a search, so it stays an unmeasured setting rather than a false zero.
 }
 

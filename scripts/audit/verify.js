@@ -19,38 +19,29 @@ const {launch, openX} = require('./lib/browser')
 const {ready, resolveContext, buildSurfaces} = require('./lib/surfaces')
 const {STATES, closeOverlays} = require('./lib/states')
 const {buildProbes} = require('./lib/probes')
+const {readFunctions, blocksFor} = require('./lib/routing')
 
 const OUT_JSON = path.join(ROOT, 'audit-results', 'verify.json')
 
 // Selector shapes worth testing. Anything else in these blocks is layout glue
-// that cannot be counted meaningfully on its own.
+// that cannot be counted meaningfully on its own. The data-* form covers icon
+// names (data-icon) and X's semantic attributes; the href form covers sprite
+// icons (use[href="#icon-…"]) as well as links.
 const PATTERNS = [
-  /\[data-testid[\^$*]?="([^"]+)"\]/g,
+  /\[data-(?!cpft)[a-z][\w-]*(?:[\^$*]?="[^"]*")?\]/g,
+  /\[id[\^$*]?="[^"]+"\]/g,
   /\[aria-label="([^"]+)"\]/g,
   /\[href[\^$*]?="([^"]+)"\]/g,
 ]
 
-function readSource() {
-  return fs.readFileSync(path.join(ROOT, 'script.js'), 'utf8')
-}
-
 // Every top-level declaration, so a setting referenced anywhere is found.
+// Generous like routing's blocks: this is a census, not a verdict.
 function blocksByKey() {
-  let lines = readSource().split('\n')
-  let decl = /^(?:async )?function ([A-Za-z_$][\w$]*)|^const ([A-Za-z_$][\w$]*) = /
-  let starts = []
-  lines.forEach((l, i) => { if (decl.test(l)) starts.push(i) })
-
   let blocks = new Map()
-  for (let i = 0; i < starts.length; i++) {
-    let body = lines.slice(starts[i], starts[i + 1] ?? lines.length).join('\n')
-    let refs = [...body.matchAll(/config\.([A-Za-z_$][\w$]*)/g)]
-    refs.forEach((m, j) => {
-      let key = m[1]
-      let next = refs.slice(j + 1).find(r => r[1] != key)
-      let end = Math.max(next ? next.index : body.length, m.index + 900)
-      blocks.set(key, (blocks.get(key) || '') + '\n' + body.slice(m.index, end))
-    })
+  for (let fn of readFunctions()) {
+    for (let [key, block] of blocksFor(fn.body, 900)) {
+      blocks.set(key, (blocks.get(key) || '') + '\n' + block)
+    }
   }
   return blocks
 }
@@ -60,6 +51,8 @@ function selectorsFor(block) {
   for (let re of PATTERNS) {
     for (let m of block.matchAll(re)) {
       let whole = m[0]
+      // A template literal frozen mid-interpolation is not a selector
+      if (whole.includes('${')) continue
       // Attribute-prefix/suffix forms need to stay as written to match correctly
       if (!found.has(whole)) found.set(whole, whole)
     }

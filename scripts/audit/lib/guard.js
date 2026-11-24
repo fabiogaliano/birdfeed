@@ -10,7 +10,8 @@
  */
 
 // GraphQL operations that change account state. URLs look like
-// /i/api/graphql/<queryId>/<OperationName>.
+// api.x.com/graphql/<queryId>/<OperationName> (the old client used
+// x.com/i/api/graphql/…).
 const BLOCKED_OPS = new Set([
   'CreateTweet', 'DeleteTweet', 'CreateRetweet', 'DeleteRetweet',
   'FavoriteTweet', 'UnfavoriteTweet',
@@ -47,15 +48,19 @@ const BLOCKED_REST_RE = new RegExp([
 const SETTINGS_RE = /\/1\.1\/account\/settings\.json/
 
 function graphqlOperation(url) {
-  let match = url.match(/\/i\/api\/graphql\/[^/]+\/([^/?#]+)/)
+  let match = url.match(/(?:\/i\/api)?\/graphql\/[^/]+\/([^/?#]+)/)
   return match ? match[1] : null
 }
 
+// The new client is Relay, which names every mutation *Mutation
+// (usePremiumPaywallOnLoadMutation). The list above was written for the old
+// client's names and nobody has confirmed which of them survived, so the
+// suffix is what keeps a like or a follow from getting through.
 function isDestructive(url, method = 'GET') {
   if (BLOCKED_REST_RE.test(url)) return true
   if (SETTINGS_RE.test(url) && method != 'GET') return true
   let op = graphqlOperation(url)
-  return op != null && BLOCKED_OPS.has(op)
+  return op != null && (BLOCKED_OPS.has(op) || /Mutation$/.test(op))
 }
 
 function installGuard(context, {onBlocked} = {}) {

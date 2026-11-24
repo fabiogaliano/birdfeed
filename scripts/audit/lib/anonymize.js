@@ -59,70 +59,86 @@ const ANONYMIZE = `
     }
   }
 
-  // Display names. Walking every leaf span under User-Name rather than guessing
-  // one path: quoted tweets, replies and hover cards each nest these
-  // differently, and a missed structure leaks a real person's name.
   let isNoise = (t) => !t || t.startsWith('@') || t === '·' ||
                        /^\\d+[smhd]$/.test(t) || /^[A-Z][a-z]{2} \\d+$/.test(t)
 
-  for (let $un of document.querySelectorAll('[data-testid="User-Name"]')) {
-    for (let el of $un.querySelectorAll('span')) {
-      if (el.children.length || el.dataset.anon) continue
-      let text = (el.textContent || '').trim()
-      if (isNoise(text) || NAMES.includes(text)) { el.dataset.anon = '1'; continue }
-      el.dataset.anon = '1'
-      el.textContent = NAMES[idFor(text) % NAMES.length]
-      break
+  // Text nodes rather than leaf elements: a display name is a bare text node
+  // beside its badge and emoji, so a leaf-element walk never reaches it and the
+  // real name leaks. Structure is left alone, so the layout doesn't shift.
+  // Swapped nodes are remembered rather than marked, so a re-run only touches
+  // nodes React has rendered since - re-swapping a stand-in would map it again
+  // and the before/after pair would disagree.
+  window.__anonText ??= new WeakSet()
+  let textNodes = (root) => {
+    let walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT)
+    let out = []
+    while (walker.nextNode()) {
+      let node = walker.currentNode
+      if (node.textContent.trim() && !window.__anonText.has(node) &&
+          !node.parentElement?.closest('[data-anon]')) out.push(node)
+    }
+    return out
+  }
+  let swap = (node, value) => {
+    node.textContent = value
+    window.__anonText.add(node)
+  }
+  let lorem = (text, count, step) => Array.from({length: count},
+    (_, i) => WORDS[(idFor(text) + i * step) % WORDS.length]).join(' ')
+
+  // Display names: the author link's name block in every post header. The
+  // first real text is the name; anything after it is cleared, because any of
+  // it can identify the person.
+  for (let $name of document.querySelectorAll('article a[href^="/"]:not([href*="/status/"]) > div[dir="auto"]')) {
+    let nodes = textNodes($name).filter(n => !isNoise(n.textContent.trim()))
+    if (!nodes.length) continue
+    swap(nodes[0], NAMES[idFor(nodes.map(n => n.textContent.trim()).join(' ')) % NAMES.length])
+    for (let node of nodes.slice(1)) swap(node, '')
+  }
+
+  // Names also appear outside posts: hover cards, user cells in Who to follow
+  // and Relevant people, the sidebar. Those carry bios too, which are just as
+  // identifying. A user cell is a [role=link] to a profile; posts link to a
+  // /status/ and trends to /search, so both are left out.
+  let cards = [
+    '[data-base-ui-portal] [role="presentation"]',
+    '[role="link"][data-href^="/"]:not([data-href*="/status/"]):not([data-href^="/search"])',
+    'aside',
+  ].join(', ')
+  for (let $card of document.querySelectorAll(cards)) {
+    for (let node of textNodes($card)) {
+      let text = node.textContent.trim()
+      if (isNoise(text) || text.length < 3) continue
+      swap(node, text.length > 24 ? lorem(text, 12, 3) : NAMES[idFor(text) % NAMES.length])
     }
   }
 
-  // Names also appear outside User-Name: hover cards, "Relevant people", the
-  // account switcher. Those carry bios too, which are just as identifying.
-  for (let $card of document.querySelectorAll('[data-testid="HoverCard"], [data-testid="UserCell"], aside')) {
-    for (let el of $card.querySelectorAll('span, div')) {
-      if (el.children.length || el.dataset.anon) continue
-      let text = (el.textContent || '').trim()
-      if (isNoise(text) || text.length < 3 || NAMES.includes(text)) continue
-      el.dataset.anon = '1'
-      el.textContent = text.length > 24
-        ? Array.from({length: 12}, (_, i) => WORDS[(idFor(text) + i * 3) % WORDS.length]).join(' ')
-        : NAMES[idFor(text) % NAMES.length]
+  // The logged-in account's own name, in the account switcher under the rail
+  for (let $acct of document.querySelectorAll('div:has(> [data-rail-overflow]) > div > button[aria-haspopup="menu"]')) {
+    for (let node of textNodes($acct)) {
+      if (!node.textContent.trim().startsWith('@')) swap(node, NAMES[0])
     }
   }
 
-  // The logged-in account's own name, in the sidebar switcher
-  for (let $acct of document.querySelectorAll('[data-testid="SideNav_AccountSwitcher_Button"]')) {
-    for (let el of $acct.querySelectorAll('span')) {
-      if (el.children.length || el.dataset.anon) continue
-      let text = (el.textContent || '').trim()
-      if (!text || text.startsWith('@')) continue
-      el.dataset.anon = '1'
-      el.textContent = NAMES[0]
-    }
-  }
-
-  // Link card headlines and descriptions - real article titles are as
-  // identifying as post text, and they sit outside tweetText
-  for (let $card of document.querySelectorAll('[data-testid="card.wrapper"]')) {
-    for (let el of $card.querySelectorAll('span, div')) {
-      if (el.children.length || el.dataset.anon) continue
-      let text = (el.textContent || '').trim()
+  // Link card headlines and "From domain" lines - real article titles are as
+  // identifying as post text, and they sit outside it. Cards are external links
+  // holding blocks; inline text links hold only text.
+  for (let $card of document.querySelectorAll('article a[target="_blank"]:has(> div)')) {
+    for (let node of textNodes($card)) {
+      let text = node.textContent.trim()
       if (text.length < 4 || /^[\\w.]+\\.[a-z]{2,}$/.test(text)) continue
-      el.dataset.anon = '1'
-      let count = Math.max(3, Math.min(10, text.split(/\\s+/).length))
-      el.textContent = Array.from({length: count},
-        (_, i) => WORDS[(idFor(text) + i * 5) % WORDS.length]).join(' ')
+      swap(node, lorem(text, Math.max(3, Math.min(10, text.split(/\\s+/).length)), 5))
     }
   }
 
-  // Post text: keep roughly the original length so layout doesn't shift
-  for (let $text of document.querySelectorAll('[data-testid="tweetText"]')) {
-    if ($text.dataset.anon) continue
-    $text.dataset.anon = '1'
-    let count = Math.max(5, Math.min(38, ($text.textContent || '').split(/\\s+/).length))
-    let seed = idFor($text.textContent)
-    $text.textContent = Array.from({length: count},
-      (_, i) => WORDS[(seed + i * 3) % WORDS.length]).join(' ')
+  // Post text: keep roughly the original length so layout doesn't shift. Per
+  // text node, because the text block also holds links and mentions whose
+  // elements other settings (unwrapTcoLinks) act on.
+  for (let $text of document.querySelectorAll('article div[dir="auto"][lang]')) {
+    for (let node of textNodes($text)) {
+      let text = node.textContent
+      swap(node, lorem(text, Math.max(1, Math.min(38, text.trim().split(/\\s+/).length)), 3) + ' ')
+    }
   }
 
   return {

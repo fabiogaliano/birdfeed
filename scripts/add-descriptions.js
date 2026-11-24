@@ -59,15 +59,11 @@ const DESCRIPTIONS = {
 
   // --- Branding ---
   replaceLogo: 'Puts the Twitter bird back in place of the X logo, and restores the home and messages icons that came with it.',
-  darkModeTheme: 'Which dark theme to use: dim or lights out.',
   hideViews: 'Hides the view count shown under posts.',
   hideVerifiedNotificationsTab: 'Removes the "Verified" tab from Notifications and the Followers page.',
-  restoreTweetSource: 'Shows which app a post was sent from. Only appears on a post\'s own page, not in the timeline.',
   restorePhotoGrid: 'Shows a post\'s photos as a grid - 2 side by side, 4 as a square - instead of a swipeable carousel.',
   addFocusedTweetAccountLocation: 'Adds the account\'s country under a post you have opened.',
   addUserHoverCardAccountLocation: 'Adds the account\'s country to the card that appears when you hover a name.',
-  restoreLinkHeadlines: 'Puts the article headline back under link previews, which X reduced to a bare domain.',
-  restoreQuoteTweetsLink: 'Shows the quote count as a link under a post you have opened. Only on the post\'s own page, and only if it has quotes.',
   restoreOtherInteractionLinks: 'Shows retweet and like counts as links under a post you have opened. Only on the post\'s own page.',
   sortReplies: 'Which order replies open in.',
   hideSortRepliesMenu: 'Removes the "Sort replies" control from a post\'s page.',
@@ -83,7 +79,6 @@ const DESCRIPTIONS = {
   hideGrokNav: 'Removes the Grok item from the left navigation.',
   hideGrokTweets: 'Removes posts that share a Grok conversation link.',
   hideEditImage: 'Removes the Grok \'Edit image\' links that X adds to photos in posts and to profile settings.',
-  hideJobsNav: 'Removes the Jobs item from the left navigation. Only appears on accounts that have it.',
   hideSubscriptions: 'Removes everything to do with paid subscriptions: Subscribe buttons on profiles and posts, the Subscriptions tab and count, the Subscribe menu items, and the subscriber badge on replies.',
 
   // --- Appearance ---
@@ -126,7 +121,6 @@ const DESCRIPTIONS = {
   hideBookmarksNav: "Removes Bookmarks from the navigation.",
   hideBusinessNav: "Removes Business from the navigation. Only appears on accounts that have it.",
   hideCommunitiesNav: "Removes Communities from the navigation.",
-  hideConnectNav: "Removes the Follow / Connect item from the navigation.",
   hideCreatorStudioNav: "Removes Creator Studio from the navigation. Only appears on accounts that have it.",
   hideListsNav: "Removes Lists from the navigation.",
 

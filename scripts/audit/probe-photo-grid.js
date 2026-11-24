@@ -3,10 +3,11 @@
 //   node scripts/audit/probe-photo-grid.js
 //
 // X reserves the carousel's height on an ancestor with a percentage
-// padding-bottom, with the carousel absolutely positioned inside it. The
-// restorePhotoGrid rules resize the ScrollSnap list, so unless that ancestor is
-// corrected too the tweet keeps a carousel-tall hole above its action bar.
-// A grid whose gap matches the carousel's own is correct.
+// padding-bottom (div.h-0), sized for the first photo, with the carousel
+// absolutely positioned inside it. The restorePhotoGrid rules re-lay the slides
+// as a grid, so unless that ancestor is corrected too the post keeps a hole
+// above its action bar, or overflows into it. A grid whose gap matches the
+// carousel's own is correct.
 const fs = require('fs')
 const path = require('path')
 
@@ -16,25 +17,30 @@ const {setConfig} = require('./lib/measure')
 
 const OUT = path.join(ROOT, 'audit-results', 'photo-grid')
 
+// Photos only, 2-4 of them, and not inside a quoted post - a quote's carousel
+// sits above the outer post's action bar with the quote's own chrome between.
 const MEASURE = () => {
-  let lists = [...document.querySelectorAll('[data-testid="ScrollSnap-List"]')]
-    .filter(($el) => $el.querySelector('[data-testid="tweetPhoto"]') &&
-                     $el.childElementCount >= 2 && $el.childElementCount <= 4 &&
-                     !$el.querySelector('[data-testid="videoPlayer"], [data-testid="videoComponent"]'))
+  let photos = ($el) => [...$el.querySelectorAll('a[data-engagement-action="media"][href*="/photo/"]')]
+  let carousels = [...document.querySelectorAll('article [class*="group/carousel"]')]
+    .filter(($el) => {
+      let count = new Set(photos($el).map(($a) => $a.getAttribute('href'))).size
+      return count >= 2 && count <= 4 && !$el.querySelector('video') &&
+             !$el.closest('[data-slot="embedded-tweet-frame"]')
+    })
 
-  return lists.map(($list, i) => {
-    let $tweet = $list.closest('[data-testid="tweet"]')
+  return carousels.map(($carousel, i) => {
+    let $tweet = $carousel.closest('article')
     let $group = $tweet?.querySelector('[role="group"]')
-    let photoBottom = Math.max(...[...$list.querySelectorAll('[data-testid="tweetPhoto"]')]
-      .map(($p) => $p.getBoundingClientRect().bottom))
+    let photoBottom = Math.max(...photos($carousel).map(($p) => $p.getBoundingClientRect().bottom))
     if ($tweet) $tweet.setAttribute('data-probe', String(i))
     return {
       i,
-      slides: $list.childElementCount,
+      slides: new Set(photos($carousel).map(($a) => $a.getAttribute('href'))).size,
       // What the user sees: dead space between the last photo and the buttons.
       gap: $group ? Math.round($group.getBoundingClientRect().top - photoBottom) : null,
       tweetHeight: $tweet ? Math.round($tweet.getBoundingClientRect().height) : null,
-      href: $tweet?.querySelector('a[href*="/status/"]')?.getAttribute('href') || null,
+      // The timestamp is the permalink; the photo links go to /photo/N
+      href: $tweet?.querySelector('a[data-base-ui-tooltip-trigger][href*="/status/"]')?.getAttribute('href') || null,
     }
   })
 }

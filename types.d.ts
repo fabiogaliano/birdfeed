@@ -9,7 +9,6 @@ export type Config = {
   // XXX This is now more like "use the Following tab by default"
   alwaysUseLatestTweets: boolean
   bypassAgeVerification: boolean
-  darkModeTheme: 'lightsOut' | 'dim'
   defaultToLatestSearch: boolean
   disableHomeTimeline: boolean
   disabledHomeTimelineRedirect: 'notifications' | 'messages' | 'i/bookmarks'
@@ -27,7 +26,6 @@ export type Config = {
   hideChatNav: boolean
   hideCommunitiesNav: boolean
   hideComposeTweet: boolean
-  hideConnectNav: boolean
   hideCreatorStudioNav: boolean
   hideEditImage: boolean
   hideExplorePageContents: boolean
@@ -36,7 +34,6 @@ export type Config = {
   hideGrokNav: boolean
   hideGrokTweets: boolean
   hideInlinePrompts: boolean
-  hideJobsNav: boolean
   hideLikeMetrics: boolean
   hideListsNav: boolean
   hideMetrics: boolean
@@ -75,11 +72,8 @@ export type Config = {
   reducedInteractionMode: boolean
   // XXX This now controls all replacement of X brand changes
   replaceLogo: boolean
-  restoreLinkHeadlines: boolean
-  restoreQuoteTweetsLink: boolean
   restoreOtherInteractionLinks: boolean
   restorePhotoGrid: boolean
-  restoreTweetSource: boolean
   retweets: SharedTweetsConfig
   showBlueReplyFollowersCount: boolean
   showBlueReplyFollowersCountAmount: string

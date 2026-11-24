@@ -9,11 +9,12 @@ const {installGuard} = require('./guard')
 
 const PROFILE_DIR = path.join(ROOT, '.x-profile')
 
-// Desktop and mobile are separate codepaths in script.js, selected by the app
-// wrapper's flex-direction - so layout is a property of window width, not a
-// setting. 1600 is comfortably past X's sidebar breakpoint.
+// Desktop and mobile are separate codepaths in script.js, selected by a
+// (max-width: 511px) media query - so layout is a property of window width, not
+// a setting. 1600 is comfortably past X's 1024px sidebar breakpoint, and 400 is
+// under the 512px one where the rail gives way to the bottom bar.
 const DESKTOP = {width: 1600, height: 1000}
-const MOBILE = {width: 600, height: 900}
+const MOBILE = {width: 400, height: 900}
 
 // The extension is loaded rather than hand-injected so what we measure is what
 // ships - content.js's document_start logo swap included.
@@ -74,19 +75,15 @@ async function openX(page, url = 'https://x.com/home', {layout = 'desktop'} = {}
 // A too-narrow window makes every desktop-only setting read as dead, which is
 // indistinguishable from X having broken it. Fail loudly instead.
 //
-// flex-direction alone is not enough: X only goes column below ~500px, so a
-// 680px window reports "desktop" while still dropping the sidebar. The sidebar
-// column is the signal that actually matters.
+// The mobile breakpoint alone is not enough: a 700px window is "desktop" to
+// script.js while X still hides the sidebar below 1024px. The sidebar is the
+// signal that actually matters.
 async function assertLayout(page, expected) {
-  let state = await page.evaluate(() => {
-    let $appWrapper = document.querySelector('#layers + div')
-    return {
-      layout: !$appWrapper ? 'unknown'
-        : getComputedStyle($appWrapper).flexDirection == 'column' ? 'mobile' : 'desktop',
-      width: window.innerWidth,
-      sidebar: Boolean(document.querySelector('[data-testid="sidebarColumn"]')),
-    }
-  })
+  let state = await page.evaluate(() => ({
+    // The same query script.js picks its codepath by
+    layout: matchMedia('(max-width: 511px)').matches ? 'mobile' : 'desktop',
+    width: window.innerWidth,
+  }))
 
   if (state.layout != expected) {
     throw new Error(`Expected ${expected} layout but X rendered ${state.layout} (viewport ${state.width}px)`)
@@ -94,30 +91,32 @@ async function assertLayout(page, expected) {
 
   if (expected != 'desktop') return
 
-  // The sidebar renders after the primary column, so sample it with a wait
-  let sidebar = await page.locator('[data-testid="sidebarColumn"]')
+  // The aside stays in the DOM at every width and is only display:none below
+  // the breakpoint, so its presence proves nothing - visibility does. Waited
+  // for, because it renders after main.
+  let sidebar = await page.locator('aside')
                           .first()
-                          .waitFor({state: 'attached', timeout: 20_000})
+                          .waitFor({state: 'visible', timeout: 20_000})
                           .then(() => true, () => false)
   if (!sidebar) {
     throw new Error(
-      `Desktop layout has no sidebarColumn at ${state.width}px - probes for ` +
+      `Desktop layout has no visible sidebar at ${state.width}px - probes for ` +
       `sidebar settings would read as dead. Widen the viewport.`
     )
   }
 }
 
-// Waits for tweets to be *attached*, not visible: the extension hides tweets by
-// design (retweets:'separate', hideForYouTimeline), so a visibility check would
-// hang whenever a probe is doing its job.
+// Waits for posts to be *attached*, not visible: the extension collapses
+// timeline rows by design (retweets:'separate', ads), so a visibility check
+// would hang whenever a probe is doing its job.
 async function waitForTimeline(page, {timeout = 60_000} = {}) {
-  await page.waitForSelector('[data-testid="tweet"]', {state: 'attached', timeout})
+  await page.waitForSelector('[id^="urt:"] > ul > li article', {state: 'attached', timeout})
 }
 
+// The viewer is in the server-rendered boot data, so this doesn't depend on
+// any nav markup, which hide*Nav settings remove by design.
 async function isLoggedIn(page) {
-  return await page.locator('a[data-testid="AppTabBar_Home_Link"]')
-                   .first()
-                   .waitFor({state: 'visible', timeout: 30_000})
+  return await page.waitForFunction(() => window.__INITIAL_DATA__?.viewerScreenName, null, {timeout: 30_000})
                    .then(() => true, () => false)
 }
 

@@ -20,6 +20,12 @@ const RETIRED = {
   redirectTwitterLinks: 'nitter.net',
   tweakNewLayout: true,
   hideToggleNavigation: true,
+  hideJobsNav: true,
+  hideConnectNav: true,
+  darkModeTheme: 'dim',
+  restoreTweetSource: true,
+  restoreLinkHeadlines: true,
+  restoreQuoteTweetsLink: true,
 }
 
 const LIVE = {hideViews: true, navDensity: 'compact', twitterBlueChecks: 'hide'}

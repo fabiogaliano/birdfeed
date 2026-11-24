@@ -10,53 +10,78 @@ const {CONTENT_SURFACES} = require('./content')
 //
 // Two independent signals, unioned:
 //  1. The function a setting is referenced in. Many of them name their own
-//     surface outright (tweakExplorePage, shouldHideProfileTimelineItem).
-//  2. The selectors near the reference, for the big CSS builders whose names
-//     say nothing because every setting lives in the same function.
+//     surface outright (processFocusedTweet, processHoverCard).
+//  2. The selectors and timeline contexts near the reference, for configureCss
+//     and the timeline filter, whose names say nothing because many settings
+//     live in the same function.
 //
 // Over-attribution costs one wasted probe; under-attribution loses a setting
 // entirely, so both signals are deliberately generous.
 
 // Matched against the enclosing function's name.
 const FUNCTION_ROUTES = [
-  [/^tweakExplorePage/, {surface: 'explore'}],
-  [/^tweakBookmarksPage/, {surface: 'bookmarks'}],
-  [/^shouldHideProfileTimelineItem|^tweakFollowListPage/, {surface: 'profile'}],
-  [/^shouldHideHomeTimelineItem|^tweakDesktopLogo|^tweakHomeIcon|^tweakMessagesIcon/, {surface: 'home'}],
-  // The focused tweet and its permalink bar only exist on a tweet's own page.
-  [/^onIndividualTweetTimelineChange|^tweakIndividualTweetPage|^tweakFocusedTweet/, {surface: 'tweetDetail'}],
-  [/^restoreTweetSource|^restoreTweetInteractionsLinks/, {surface: 'tweetDetail'}],
-  // Per-tweet hiding in the observer applies to every timeline that renders tweets.
-  [/^onTimelineChange|^restoreLinkHeadline|^unwrapTcoLinks/, {surface: 'home'}, {surface: 'tweetDetail'}],
-  [/^handlePopup|^onPopup/, {state: 'caretMenu'}],
+  // The timeline filter runs on every timeline. Which ones a given setting
+  // applies to is read from the `context ==` checks beside it (below), so
+  // this only needs to place it somewhere it renders.
+  [/^shouldHideTweet$|^shouldRemoveEntry$|^isMutedQuote$/, {surface: 'home'}],
+  // The focused post, its reply sort and its interaction links only exist on a
+  // post's own page; Premium replies are only judged there.
+  [/^processFocusedTweet$|^applyInitialRepliesSort$|^addInteractionLinks$|^patchRepliesSort$|^shouldHidePremiumReply$/, {surface: 'tweetDetail'}],
+  [/^patchFollowingSort$|^processHomeTabs$|^processSidebar$/, {surface: 'home'}],
+  // Per-post additions apply wherever posts render.
+  [/^processArticle$|^unwrapTcoLinks$|^oneClick/, {surface: 'home'}, {surface: 'tweetDetail'}],
+  // Static CSS applies on every page, and home has the nav, the sidebar and
+  // posts. The selectors beside each rule add any page it is specific to.
+  [/^configureCss$/, {surface: 'home'}],
+  // The only page-specific CSS is the quotes page's
+  [/^configureDynamicCss$/, {surface: 'quotes'}],
+  [/^processHoverCard$/, {state: 'hoverCard'}],
+  // processMenu serves both menus; the muted word item's own route is the
+  // addAddMutedWordMenuItem( call beside its reference, below.
+  [/^processMenu$|^addMuteQuotesMenuItems$/, {state: 'caretMenu'}],
 ]
 
 // Matched against the selectors surrounding the reference.
+// configureCss names its nav scopes `rail`, `anyNav` and `menus`, so the
+// variable names stand in for the selectors they hold.
 const SELECTOR_ROUTES = [
-  [/body\.LightsOut|body\.Dim/, {theme: 'lightsOut'}],
-  [/menuRole|\[role="menu"\]/, {state: 'moreMenu'}],
-  [/HoverCard|#layers/, {state: 'hoverCard'}],
-  [/data-testid="Dropdown"|sheetDialog|data-testid="caret"/, {state: 'caretMenu'}],
-  [/body\.Profile|\.Profile /, {surface: 'profile'}],
-  // #cpft*Count are injected onto the focused tweet, so they imply tweetDetail
-  // even when the same setting also hides timeline metrics.
-  [/\.Views|body\.Tweet|tabindex="-1"|#cpft\w*Count/, {surface: 'tweetDetail'}],
-  [/body\.Search|SearchBox/, {surface: 'search'}],
-  [/notification/i, {surface: 'notifications'}],
-  [/dm-|DMDrawer|chat-drawer/, {surface: 'messages'}],
-  [/SidebarContents|sidebarColumn|WhatsHappening|complementary|news_sidebar/, {surface: 'home'}],
+  // Nothing in script.js is theme-scoped today; kept so a dark-only rule
+  // added later gets probed in the dark theme.
+  [/data-theme="?dark/, {theme: 'lightsOut'}],
+  // The nav's More menu holds Lists, Communities, Business, Ads and Spaces.
+  [/\$\{menus\}|\$\{anyNav\}|\[role="menu"\]|addAddMutedWordMenuItem\(/, {state: 'moreMenu'}],
+  // Menus and hover cards share the portal; a hover card is the
+  // role=presentation popup with the Followers link in it.
+  [/\[data-base-ui-portal\][^\n]*(?:\[role="presentation"\]|verified_followers)/, {state: 'hoverCard'}],
+  [/POST_MENU_TRIGGER|\[role="menuitem"\]|icon-feather-scatter-plot|icon-sound-off|icon-block/, {state: 'caretMenu'}],
+  [/body\.Profile|context == 'profile'|verified_followers/, {surface: 'profile'}],
+  // #cpft*Count are injected onto the focused post, so they imply tweetDetail
+  // even when the same setting also hides timeline metrics. .text-lead is the
+  // focused post's text, which nothing else uses.
+  [/body\.Tweet|\.text-lead|#cpft\w*Count|context == 'tweet'|tweetdetail/, {surface: 'tweetDetail'}],
+  [/body\.Search|context == 'search'|path == '\/search'/, {surface: 'search'}],
+  [/body\.Explore/, {surface: 'explore'}],
+  [/body\.Bookmarks/, {surface: 'bookmarks'}],
+  // Not the nav's /notifications link, which is on every page
+  [/TimelineNotification|body\.Notifications|urt:notifications|'NOTIFICATION_/, {surface: 'notifications'}],
+  [/body\.Messages/, {surface: 'messages'}],
+  // The sidebar and the dock are on home, and so is everything the home
+  // timeline filter and its tabs act on.
+  [/\baside\b|xds-dock|body\.HomeTimeline|context == 'home'|data-pinned-timeline|path == '\/home'/, {surface: 'home'}],
 ]
 
-// Top-level declarations, including the `const x = (() => {...})()` builders
-// that hold replaceLogo and navBaseFontSize.
+// Top-level declarations. `let`s and assignments count too, so code that sits
+// between functions - the window.fetch wrapper, the __INITIAL_DATA__ trap - is
+// its own block rather than the tail of the function above it, which would
+// route its settings to wherever that function acts.
 function readFunctions() {
   let lines = fs.readFileSync(path.join(ROOT, 'script.js'), 'utf8').split('\n')
-  let decl = /^(?:async )?function ([A-Za-z_$][\w$]*)|^const ([A-Za-z_$][\w$]*) = /
+  let decl = /^(?:async )?function ([A-Za-z_$][\w$]*)|^(?:const|let) ([A-Za-z_$][\w$]*)\b|^([A-Za-z_$][\w$.]*) = /
   let found = []
 
   lines.forEach((line, i) => {
     let m = line.match(decl)
-    if (m) found.push({name: m[1] || m[2], line: i})
+    if (m) found.push({name: m[1] || m[2] || m[3], line: i})
   })
 
   return found.map((f, i) => ({
@@ -65,9 +90,11 @@ function readFunctions() {
   }))
 }
 
-// The text a reference gets judged on. It runs to the next reference of a
-// different setting, with a floor so that `config.a && config.b` - where the
-// selectors come after both - doesn't truncate to nothing.
+// The text a reference gets judged on. It starts at the beginning of the line,
+// because the condition often sits in front of the reference -
+// `context == 'profile' && config.hideProfileRetweets` - and runs to the next
+// reference of a different setting, with a floor so that `config.a && config.b`
+// - where the selectors come after both - doesn't truncate to nothing.
 const MIN_BLOCK = 800
 
 // minBlock is a parameter because the two callers want opposite things.
@@ -81,8 +108,14 @@ function blocksFor(body, minBlock = MIN_BLOCK) {
   refs.forEach((m, i) => {
     let key = m[1]
     let next = refs.slice(i + 1).find(r => r[1] != key)
+    let start = body.lastIndexOf('\n', m.index) + 1
     let end = Math.max(next ? next.index : body.length, m.index + minBlock)
-    let text = body.slice(m.index, Math.min(end, body.length))
+    // The floor never crosses into the next //#region of configureCss: that is
+    // a different area of the page, and its selectors would vouch for a
+    // setting that has none of its own.
+    let region = body.indexOf('//#', m.index)
+    if (region != -1) end = Math.min(end, region)
+    let text = body.slice(start, Math.min(end, body.length))
     blocks.set(key, (blocks.get(key) || '') + '\n' + text)
   })
 

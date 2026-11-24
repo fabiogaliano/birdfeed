@@ -74,14 +74,10 @@ ${messages.xFixesLabel}:
 • ${messages.redirectToTwitterLabel}
 • ${messages.redirectChatNavLabel}
 • ${messages.replaceLogoLabel}
-• ${messages.darkModeThemeLabel} (${messages.option_dim})
 • ${messages.hideViewsLabel}
 • ${messages.hideVerifiedNotificationsTabLabel}
-• ${messages.restoreTweetSourceLabel}
 • ${messages.addFocusedTweetAccountLocationLabel}
 • ${messages.addUserHoverCardAccountLocationLabel}${messages.desktopVersion}
-• ${messages.restoreLinkHeadlinesLabel}
-• ${messages.restoreQuoteTweetsLinkLabel}
 • ${messages.restoreOtherInteractionLinksLabel}
 • ${messages.sortRepliesLabel} (${messages.option_recent} / ${messages.option_liked})
 • ${messages.hideSortRepliesMenuLabel}
@@ -91,7 +87,6 @@ ${messages.xFixesLabel}:
 • ${messages.hideGrokLabel}
 • ${messages.hideGrokTweetsLabel}
 • ${messages.hideEditImageLabel}
-• ${messages.hideJobsLabel}
 • ${messages.hideSubscriptionsLabel}
 
 ${messages.uiTweaksOptionsLabel}:
@@ -129,7 +124,6 @@ ${messages.hideUnusedUiItemsOptionsLabel}:
 • ${messages.hideMessagesDrawerLabel}${messages.desktopVersion}
 • ${messages.hideExploreNavLabel}${messages.desktopVersion}
 • ${messages.hideCreatorStudioNavLabel}
-• ${messages.hideConnectNavLabel}
 • ${messages.hideCommunitiesNavLabel}
 • ${messages.hideMoreSlideOutMenuItemsOptionsLabel_desktop}
 `.trim()
